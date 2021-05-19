@@ -3,6 +3,7 @@
 #include<string>
 #include"AnalyseYield.h"
 #include"Analyse.h"
+#include"TMatrix.h"
 
 AnalyseYield::AnalyseYield(TreeWrapper *Tree): Analyse(Tree), m_EventsOutsideMBCSpace(0), m_EventsOutsidePhaseSpace(0) {
   m_Yields.insert({'S', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
@@ -23,7 +24,7 @@ double AnalyseYield::GetBackgroundSubtractedYield(int Bin) const {
   return m_Yields.at('S')[Bin] - Background;
 }
 
-void AnalyseYield::CalculateDoubleTagYields(const std::string &Filename) {
+void AnalyseYield::CalculateDoubleTagYields(const TMatrixT<double> &BinMigrationMatrix, const std::string &Filename) {
   for(int i = 0; i < m_Tree->GetEntries(); i++) {
     m_Tree->GetEntry(i);
     int BinNumber = DetermineReconstructedBinNumber();
@@ -38,11 +39,26 @@ void AnalyseYield::CalculateDoubleTagYields(const std::string &Filename) {
     }
     m_Yields.at(Region)[BinNumber]++;
   }
-  SaveResults(Filename);
+  SaveFinalYields(BinMigrationMatrix, Filename);
 }
 
-void AnalyseYield::SaveResults(const std::string &Filename) const {
+void AnalyseYield::SaveFinalYields(const TMatrixT<double> &BinMigrationMatrix, const std::string &Filename) const {
+  TMatrixT<double> RawDoubleTagYield(2*m_BinningScheme.GetNumberBins(), 1);
+  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+    RawDoubleTagYield[ArrayIndex(i)][0] = GetBackgroundSubtractedYield(i);
+  }
+  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+    RawDoubleTagYield[ArrayIndex(-i)][0] = GetBackgroundSubtractedYield(-i);
+  }
+  RawDoubleTagYield = BinMigrationMatrix*RawDoubleTagYield;
   std::ofstream ResultsFile(Filename);
+  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+    ResultsFile << RawDoubleTagYield[ArrayIndex(i)][0] << " ";
+  }
+  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+    ResultsFile << RawDoubleTagYield[ArrayIndex(-i)][0] << " ";
+  }
+  ResultsFile << "\n";
   for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
     ResultsFile << GetBackgroundSubtractedYield(i) << " ";
   }

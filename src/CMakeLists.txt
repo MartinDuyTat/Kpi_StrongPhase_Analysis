@@ -1,4 +1,4 @@
-add_library(KpiStrongPhase Analyse.cpp AnalyseYield.cpp BinningScheme.cpp Chi2DoubleTagYield.cpp DeltaKpiFitter.cpp DoubleTagMeasurement.cpp DoubleTagYields.cpp HadronicParameters.cpp Settings.cpp TreeWrapper.cpp)
+add_library(KpiStrongPhase Analyse.cpp AnalyseBinMigration.cpp AnalyseTruthYield.cpp AnalyseYield.cpp BinningScheme.cpp Chi2DoubleTagYield.cpp DeltaKpiFitter.cpp DoubleTagMeasurement.cpp DoubleTagYields.cpp HadronicParameters.cpp Settings.cpp TreeWrapper.cpp)
 
 target_include_directories(KpiStrongPhase PUBLIC ../include)
 

@@ -18,6 +18,10 @@ class Analyse {
     Analyse(TreeWrapper *Tree);
   protected:
     /**
+     * Convert array index
+     */
+    int ArrayIndex(int i) const;
+    /**
      * Determine MBC region for the current event
      */
     char DetermineMBCRegion() const;

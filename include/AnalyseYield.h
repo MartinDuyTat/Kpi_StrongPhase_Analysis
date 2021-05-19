@@ -10,6 +10,7 @@
 #include<string>
 #include"BinVector.h"
 #include"Analyse.h"
+#include"TMatrixT.h"
 
 class AnalyseYield: public Analyse {
   public:
@@ -24,14 +25,15 @@ class AnalyseYield: public Analyse {
     double GetBackgroundSubtractedYield(int Bin) const;
     /**
      * Run the analysis and save the double tag yields
+     * @param BinMigrationMatrix Matrix that accounts for bin migration
      * @param Filename Filename where the yields are saved
      */
-    void CalculateDoubleTagYields(const std::string &Filename);
+    void CalculateDoubleTagYields(const TMatrixT<double> &BinMigrationMatarix, const std::string &Filename);
     /**
      * Function that saves the results to a file
      * @param Filename Filename where the yields are saved
      */
-    void SaveResults(const std::string &Filename) const;
+    void SaveFinalYields(const TMatrixT<double> &BinMigrationMatrix, const std::string &Filename) const;
   private:
     /**
      * Map with the yields in each bin and each region

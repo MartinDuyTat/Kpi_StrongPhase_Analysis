@@ -9,6 +9,16 @@
 Analyse::Analyse(TreeWrapper *Tree): m_Tree(Tree) {
 }
 
+int Analyse::ArrayIndex(int i) const {
+  if(i > 0) {
+    return i - 1;
+  } else if (i < 0) {
+    return -i + m_BinningScheme.GetNumberBins() - 1;
+  } else {
+    throw std::out_of_range("Cannot have bin number 0");
+  }
+}
+
 char Analyse::DetermineMBCRegion() const {
   double SignalMBC = m_Tree->GetReconstructedKinematics().SignalMBC;
   double TagMBC = m_Tree->GetReconstructedKinematics().TagMBC;

@@ -4,6 +4,7 @@
 #include<string>
 #include"TreeWrapper.h"
 #include"TEntryList.h"
+#include"TCut.h"
 
 TreeWrapper::TreeWrapper(const std::string &Filename, const std::string &TreeName, const std::string &CutFile, const std::string &DataType): m_Chain(TreeName.c_str()) {
   std::ifstream DataFile(Filename);
@@ -13,12 +14,14 @@ TreeWrapper::TreeWrapper(const std::string &Filename, const std::string &TreeNam
   }
   DataFile.close();
   std::ifstream Infile(CutFile);
-  std::string Cuts;
-  std::getline(Infile, Cuts);
-  m_Chain.Draw(">> elist", Cuts.c_str(), "entrylist");
+  TCut Cuts;
+  while(std::getline(Infile, line)) {
+    Cuts = Cuts && TCut(line.c_str());
+  }
+  Infile.close();
+  m_Chain.Draw(">> elist", Cuts, "entrylist");
   m_elist = (TEntryList*)gDirectory->Get("elist");
   m_Chain.SetEntryList(m_elist);
-  Infile.close();
   SetBranchAddresses(DataType);
 }
 
