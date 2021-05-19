@@ -11,6 +11,7 @@
 #include"AnalyseYield.h"
 #include"AnalyseBinMigration.h"
 #include"AnalyseTruthYield.h"
+#include"AnalyseFinalYields.h"
 
 int main(int argc, char *argv[]) {
   if(argc != 2) {
@@ -29,5 +30,7 @@ int main(int argc, char *argv[]) {
   TreeWrapper DataTree(KpiSettings::Get().GetString("DataFiles"), KpiSettings::Get().GetString("TreeName"), KpiSettings::Get().GetString("DataCutFile"), "Data");
   AnalyseYield Analysis(&DataTree);
   Analysis.CalculateDoubleTagYields(AnalysisBinMigration.GetBinMigrationMatrix(), KpiSettings::Get().GetString("DataResultsFile"));
+  AnalyseFinalYields AnalysisFinalYields(KpiSettings::Get().GetString("TruthResultsFile"), KpiSettings::Get().GetString("SignalMCResultsFile"), KpiSettings::Get().GetString("DataResultsFile"));
+  AnalysisFinalYields.CalculateFinalYields(KpiSettings::Get().GetString("FinalYieldsFile"));
   return 0;
 }
