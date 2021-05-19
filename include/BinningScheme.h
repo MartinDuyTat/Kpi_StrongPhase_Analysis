@@ -21,11 +21,19 @@ class BinningScheme {
      * @param KCharge Charge of the tag kaon
      */
     int GetBinNumber(double M2Plus, double M2Minus, int KCharge) const;
+    /**
+     * Get number of bins
+     */
+    int GetNumberBins() const;
   private:
     /**
      * 2D histogram that contains the binning scheme
      */
-    TH2F m_BinningScheme;
+    TH2F *m_BinningScheme;
+    /**
+     * Number of bins in binning scheme
+     */
+    int m_NumberBins;
 };
 
 #endif
