@@ -7,10 +7,11 @@
 #define ANALYSETRUTHYIELD
 
 #include<string>
+#include"Analyse.h"
 #include"BinVector.h"
 #include"TreeWrapper.h"
 
-class AnalyseTruthYield {
+class AnalyseTruthYield: public Analyse {
   public:
     /**
      * Constructor that saves a pointer to the NTuple containing the data and also sets up binning scheme
@@ -19,11 +20,9 @@ class AnalyseTruthYield {
     AnalyseTruthYield(TreeWrapper *Tree);
     /**
      * Run the analysis and save true double tag efficiencies
-     * @param SignalMCYield The yield from signal MC
      * @param Filename Filename of text file to save double tag efficiencies
-     * @return Returns the bin efficiencies
      */
-    BinVector<double> CalculateTruthYield(const BinVector<double> &SignalMCYield, const std::string &Filename);
+    void CalculateTruthYield(const std::string &Filename);
   private:
     /**
      * Double tag yields from the generator
