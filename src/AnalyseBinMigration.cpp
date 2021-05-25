@@ -18,6 +18,10 @@ void AnalyseBinMigration::CalculateBinMigrationYields(const std::string &Filenam
     if(ReconstructedBinNumber == 0) {
       continue;
     }
+    char Region = DetermineMBCRegion();
+    if(Region != 'S') {
+      continue;
+    }
     m_BinYields[ArrayIndex(GeneratorBinNumber)][ArrayIndex(ReconstructedBinNumber)]++;
   }
   SaveResults(Filename);
