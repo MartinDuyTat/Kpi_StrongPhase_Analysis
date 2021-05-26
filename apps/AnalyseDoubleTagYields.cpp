@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
   TreeWrapper MCSignalTree(KpiSettings::Get().GetString("SignalMCFiles"), KpiSettings::Get().GetString("TreeName"), KpiSettings::Get().GetString("TruthMatchingCutFile"), "SignalMC");
   AnalyseBinMigration AnalysisBinMigration(&MCSignalTree);
   AnalysisBinMigration.CalculateBinMigrationYields(KpiSettings::Get().GetString("BinMigrationMatrixFile"));
-  AnalyseYield AnalysisSignalMC(&MCSignalTree);
+  AnalyseYield AnalysisSignalMC(&MCSignalTree, false);
   AnalysisSignalMC.CalculateDoubleTagYields(AnalysisBinMigration.GetBinMigrationMatrix(), KpiSettings::Get().GetString("SignalMCResultsFile"));
   TreeWrapper TruthTree(KpiSettings::Get().GetString("TruthTupleFiles"), KpiSettings::Get().GetString("TruthTreeName"), "None", "TruthTuple");
   AnalyseTruthYield AnalysisTruthTuple(&TruthTree);

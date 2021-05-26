@@ -17,8 +17,9 @@ class AnalyseYield: public Analyse {
     /**
      * Constructor that saves a pointer to the NTuple containing the data and also sets up binning scheme
      * @param Tree Pointer to data
+     * @param SubtractBackground Set to true to use a sideband subtraction
      */
-    AnalyseYield(TreeWrapper *Tree);
+    AnalyseYield(TreeWrapper *Tree, bool SubtractBackground = true);
     /**
      * Get the background subtracted yield
      */
@@ -39,6 +40,10 @@ class AnalyseYield: public Analyse {
      * Map with the yields in each bin and each region
      */
     std::map<char, BinVector<double>> m_Yields;
+    /**
+     * If true, sideband subtraction is used to remove backgrounds
+     */
+    bool m_SubtractBackground;
     /**
      * Events outside of the MBC region
      */

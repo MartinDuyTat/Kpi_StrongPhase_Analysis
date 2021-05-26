@@ -5,7 +5,7 @@
 #include"Analyse.h"
 #include"TMatrix.h"
 
-AnalyseYield::AnalyseYield(TreeWrapper *Tree): Analyse(Tree), m_EventsOutsideMBCSpace(0), m_EventsOutsidePhaseSpace(0) {
+AnalyseYield::AnalyseYield(TreeWrapper *Tree, bool SubtractBackground): Analyse(Tree), m_SubtractBackground(SubtractBackground), m_EventsOutsideMBCSpace(0), m_EventsOutsidePhaseSpace(0) {
   m_Yields.insert({'S', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
   m_Yields.insert({'A', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
   m_Yields.insert({'B', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
@@ -45,25 +45,33 @@ void AnalyseYield::CalculateDoubleTagYields(const TMatrixT<double> &BinMigration
 void AnalyseYield::SaveFinalYields(const TMatrixT<double> &BinMigrationMatrix, const std::string &Filename) const {
   TMatrixT<double> RawDoubleTagYield(2*m_BinningScheme.GetNumberBins(), 1);
   for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
-    RawDoubleTagYield[ArrayIndex(i)][0] = GetBackgroundSubtractedYield(i);
+    if(m_SubtractBackground) {
+      RawDoubleTagYield[ArrayIndex(i)][0] = GetBackgroundSubtractedYield(i);
+    } else {
+      RawDoubleTagYield[ArrayIndex(i)][0] = m_Yields.at('S')[i];
+    }
   }
   for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
-    RawDoubleTagYield[ArrayIndex(-i)][0] = GetBackgroundSubtractedYield(-i);
+    if(m_SubtractBackground) {
+      RawDoubleTagYield[ArrayIndex(-i)][0] = GetBackgroundSubtractedYield(-i);
+    } else {
+      RawDoubleTagYield[ArrayIndex(-i)][0] = m_Yields.at('S')[-i];
+    }
   }
-  RawDoubleTagYield = BinMigrationMatrix*RawDoubleTagYield;
+  TMatrixT<double> MigrationCorrectedYield = BinMigrationMatrix*RawDoubleTagYield;
   std::ofstream ResultsFile(Filename);
+  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+    ResultsFile << MigrationCorrectedYield[ArrayIndex(i)][0] << " ";
+  }
+  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+    ResultsFile << MigrationCorrectedYield[ArrayIndex(-i)][0] << " ";
+  }
+  ResultsFile << "\n";
   for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
     ResultsFile << RawDoubleTagYield[ArrayIndex(i)][0] << " ";
   }
   for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
     ResultsFile << RawDoubleTagYield[ArrayIndex(-i)][0] << " ";
-  }
-  ResultsFile << "\n";
-  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
-    ResultsFile << GetBackgroundSubtractedYield(i) << " ";
-  }
-  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
-    ResultsFile << GetBackgroundSubtractedYield(-i) << " ";
   }
   ResultsFile << "\n" << m_EventsOutsideMBCSpace << " " << m_EventsOutsidePhaseSpace << "\n";
   std::vector<char> Regions{'S', 'A', 'B', 'C', 'D'};
