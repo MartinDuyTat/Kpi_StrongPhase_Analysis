@@ -90,6 +90,10 @@ struct GeneratorKinematics {
    * List of generated energies in the x-direction
    */
   std::vector<double> TrueEnergy = std::vector<double>(100);
+  /**
+   * Decay topology number from TopoAna
+   */
+  int iDcyTr = -1;
 };
 
 class TreeWrapper {

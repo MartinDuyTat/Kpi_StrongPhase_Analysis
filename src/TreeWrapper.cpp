@@ -28,8 +28,8 @@ TreeWrapper::TreeWrapper(const std::string &Filename, const std::string &TreeNam
 }
 
 void TreeWrapper::SetBranchAddresses(const std::string &DataType) {
-  bool RecData = DataType == "Data" || DataType == "SignalMC";
-  bool GenData = DataType == "TruthTuple" || DataType == "SignalMC";
+  bool RecData = DataType == "Data" || DataType == "SignalMC" || DataType == "TopoAna";
+  bool GenData = DataType == "TruthTuple" || DataType == "SignalMC" || DataType == "TopoAna";
   if(RecData) {
     m_Chain.SetBranchAddress("SignalKalmanFitSuccess", &m_RecKinematics.KalmanFitSuccess);
     m_Chain.SetBranchAddress("TagKCharge", &m_RecKinematics.TagKCharge);
@@ -68,6 +68,9 @@ void TreeWrapper::SetBranchAddresses(const std::string &DataType) {
     m_Chain.SetBranchAddress("True_Py", m_GenKinematics.TruePy.data());
     m_Chain.SetBranchAddress("True_Pz", m_GenKinematics.TruePz.data());
     m_Chain.SetBranchAddress("True_Energy", m_GenKinematics.TrueEnergy.data());
+  }
+  if(DataType == "TopoAna") {
+    m_Chain.SetBranchAddress("iDcyTr", &m_GenKinematics.iDcyTr);
   }
 }
 
