@@ -1,6 +1,7 @@
 // Martin Duy Tat 26th May 2021
 /**
  * AnalysePeakingBackgrounds is a class for counting the binned yield of peaking backgrounds in inclusive MC
+ * The iDcyTr numbers from TopoAna are read from a file, the first line contains the signal components, which are ignored, the second line has all the peaking backgrounds and any numbers not listed are put in some "Other" category
  */
 
 #ifndef ANALYSEPEAKINGBACKGROUNDS
@@ -8,6 +9,7 @@
 
 #include<map>
 #include<string>
+#include<vector>
 #include"BinVector.h"
 #include"Analyse.h"
 #include"TreeWrapper.h"
@@ -17,7 +19,7 @@ class AnalysePeakingBackgrounds: public Analyse {
     /**
      * Constructor that saves a pointer to the NTuple containing the data and also sets up binning scheme
      * @param Tree Pointer to data
-     * @param Filename of text file with a list of iDcyTr numbers labelling the peaking backgrounds
+     * @param Filename of text file with a list of iDcyTr numbers labelling the signal and peaking backgrounds
      */
     AnalysePeakingBackgrounds(TreeWrapper *Tree, const std::string &Filename);
     /**
@@ -35,6 +37,14 @@ class AnalysePeakingBackgrounds: public Analyse {
      * Map containing all iDcyTr numbers and the binned yields
      */
     std::map<int, BinVector<int>> m_PeakingBackgrounds;
+    /**
+     * Binned yields of other backgrounds not listed
+     */
+    BinVector<int> m_OtherBackgrounds;
+    /**
+     * List of signal iDcyTr numbers, these are ignored!
+     */
+    std::vector<int> m_SignalComponents;
 };
 
 #endif
