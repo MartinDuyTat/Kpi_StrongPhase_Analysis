@@ -2,7 +2,7 @@
 /**
  * AnalysePeakingBackgrounds is a class for counting the binned yield of peaking backgrounds in inclusive MC
  * The iDcyTr numbers from TopoAna are read from a file, the first line contains the signal components, which are ignored, the second line has all the peaking backgrounds and any numbers not listed are put in some "Other" category
- * The third line contains the scaling factors, other than the standard luminosity scale factor, which is read from the settings file
+ * The third line contains the scaling factors, other than the standard luminosity scale factor, which is read from the settings file, and the last entry is for the "Other" backgrounds category
  */
 
 #ifndef ANALYSEPEAKINGBACKGROUNDS

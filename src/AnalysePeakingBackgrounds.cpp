@@ -26,6 +26,9 @@ AnalysePeakingBackgrounds::AnalysePeakingBackgrounds(TreeWrapper *Tree, const st
     m_PeakingBackgrounds.insert({iDcyTr, BinVector<double>(true, m_BinningScheme.GetNumberBins())});
     m_ScaleFactors.insert({iDcyTr, ScaleFactor});
   }
+  double ScaleFactor;
+  ss3 >> ScaleFactor;
+  m_ScaleFactors.insert({-1, ScaleFactor});
   iDcyTrFile.close();
 }
 
@@ -44,7 +47,7 @@ void AnalysePeakingBackgrounds::CalculatePeakingBackgrounds(const std::string &F
       if(m_PeakingBackgrounds.find(iDcyTr) != m_PeakingBackgrounds.end()) {
 	m_PeakingBackgrounds.at(iDcyTr)[Bin] += m_ScaleFactors.at(iDcyTr)/MCScale;
       } else {
-	m_OtherBackgrounds[Bin] += 1.0/MCScale;
+	m_OtherBackgrounds[Bin] += m_ScaleFactors.at(-1)/MCScale;
       }
     }
   }

@@ -17,11 +17,18 @@ AnalyseYield::AnalyseYield(TreeWrapper *Tree, bool SubtractBackground, const std
     std::ifstream PeakingFile(PeakingBackgroundFile);
     std::string line;
     while(std::getline(PeakingFile, line)) {
-      int Bin;
+      std::string iDcyTr;
       double Background;
       std::stringstream ss(line);
-      ss >> Bin >> Background;
-      m_PeakingBackground[Bin] = Background;
+      ss >> iDcyTr;
+      for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+	ss >> Background;
+	m_PeakingBackground[i] += Background;
+      }
+      for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+	ss >> Background;
+	m_PeakingBackground[-i] += Background;
+      }
     }
     PeakingFile.close();
   }

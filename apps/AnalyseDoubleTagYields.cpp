@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
   AnalyseTruthYield AnalysisTruthTuple(&TruthTree);
   AnalysisTruthTuple.CalculateTruthYield(KpiSettings::Get().GetString("TruthResultsFile"));
   TreeWrapper DataTree(KpiSettings::Get().GetString("DataFiles"), KpiSettings::Get().GetString("TreeName"), KpiSettings::Get().GetString("DataCutFile"), "Data");
-  AnalyseYield Analysis(&DataTree, true, KpiSettings::Get().GetString("PeakingBackgroundYieldFile"));
+  AnalyseYield Analysis(&DataTree, true, KpiSettings::Get().GetString("PeakingBackgroundsFile"));
   Analysis.CalculateDoubleTagYields(AnalysisBinMigration.GetBinMigrationMatrix(), KpiSettings::Get().GetString("DataResultsFile"));
   AnalyseFinalYields AnalysisFinalYields(KpiSettings::Get().GetString("TruthResultsFile"), KpiSettings::Get().GetString("SignalMCResultsFile"), KpiSettings::Get().GetString("DataResultsFile"));
   AnalysisFinalYields.CalculateFinalYields(KpiSettings::Get().GetString("FinalYieldsFile"));
