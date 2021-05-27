@@ -2,6 +2,7 @@
 /**
  * AnalysePeakingBackgrounds is a class for counting the binned yield of peaking backgrounds in inclusive MC
  * The iDcyTr numbers from TopoAna are read from a file, the first line contains the signal components, which are ignored, the second line has all the peaking backgrounds and any numbers not listed are put in some "Other" category
+ * The third line contains the scaling factors, other than the standard luminosity scale factor, which is read from the settings file
  */
 
 #ifndef ANALYSEPEAKINGBACKGROUNDS
@@ -25,8 +26,9 @@ class AnalysePeakingBackgrounds: public Analyse {
     /**
      * Function that count the number of peaking background events in each bin
      * @param Filename of file where peaking backgrounds are saved
+     * @param MCScale Luminosity scale of MC sample
      */
-    void CalculatePeakingBackgrounds(const std::string &Filename);
+    void CalculatePeakingBackgrounds(const std::string &Filename, double MCScale = 1.0);
     /**
      * Function that saves the list of peaking backgrounds to a file
      * @param Filename of file where peaking backgrounds are saved
@@ -36,11 +38,15 @@ class AnalysePeakingBackgrounds: public Analyse {
     /**
      * Map containing all iDcyTr numbers and the binned yields
      */
-    std::map<int, BinVector<int>> m_PeakingBackgrounds;
+    std::map<int, BinVector<double>> m_PeakingBackgrounds;
+    /**
+     * Scale factors to the yields of different modes to correct for different branching ratios in MC
+     */
+    std::map<int, double> m_ScaleFactors;
     /**
      * Binned yields of other backgrounds not listed
      */
-    BinVector<int> m_OtherBackgrounds;
+    BinVector<double> m_OtherBackgrounds;
     /**
      * List of signal iDcyTr numbers, these are ignored!
      */

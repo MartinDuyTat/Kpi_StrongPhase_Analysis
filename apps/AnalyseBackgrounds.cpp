@@ -22,6 +22,6 @@ int main(int argc, char *argv[]) {
   KpiSettings::Get().Initialize(std::string(argv[1]));
   TreeWrapper TopoAnaTree(KpiSettings::Get().GetString("TopoAnaFiles"), KpiSettings::Get().GetString("TreeName"), KpiSettings::Get().GetString("DataCutFile"), "TopoAna");
   AnalysePeakingBackgrounds AnalysisBackgrounds(&TopoAnaTree, KpiSettings::Get().GetString("BackgroundTopologiesFile"));
-  AnalysisBackgrounds.CalculatePeakingBackgrounds(KpiSettings::Get().GetString("PeakingBackgroundsFile"));
+  AnalysisBackgrounds.CalculatePeakingBackgrounds(KpiSettings::Get().GetString("PeakingBackgroundsFile"), KpiSettings::Get().GetDouble("LuminosityScale"));
   return 0;
 }

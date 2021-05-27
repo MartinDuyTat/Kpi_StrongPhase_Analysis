@@ -9,23 +9,27 @@
 #include"BinVector.h"
 #include"TreeWrapper.h"
 
-AnalysePeakingBackgrounds::AnalysePeakingBackgrounds(TreeWrapper *Tree, const std::string &Filename): Analyse(Tree), m_OtherBackgrounds(BinVector<int>(true, m_BinningScheme.GetNumberBins())) {
+AnalysePeakingBackgrounds::AnalysePeakingBackgrounds(TreeWrapper *Tree, const std::string &Filename): Analyse(Tree), m_OtherBackgrounds(BinVector<double>(true, m_BinningScheme.GetNumberBins())) {
   std::ifstream iDcyTrFile(Filename);
-  std::string line1, line2;
+  std::string line1, line2, line3;
   std::getline(iDcyTrFile, line1);
   std::getline(iDcyTrFile, line2);
+  std::getline(iDcyTrFile, line3);
   int iDcyTr;
-  std::stringstream ss1(line1), ss2(line2);
+  std::stringstream ss1(line1), ss2(line2), ss3(line3);
   while(ss1 >> iDcyTr) {
     m_SignalComponents.push_back(iDcyTr);
   }
   while(ss2 >> iDcyTr) {
-    m_PeakingBackgrounds.insert({iDcyTr, BinVector<int>(true, m_BinningScheme.GetNumberBins())});
+    double ScaleFactor;
+    ss3 >> ScaleFactor;
+    m_PeakingBackgrounds.insert({iDcyTr, BinVector<double>(true, m_BinningScheme.GetNumberBins())});
+    m_ScaleFactors.insert({iDcyTr, ScaleFactor});
   }
   iDcyTrFile.close();
 }
 
-void AnalysePeakingBackgrounds::CalculatePeakingBackgrounds(const std::string &Filename) {
+void AnalysePeakingBackgrounds::CalculatePeakingBackgrounds(const std::string &Filename, double MCScale) {
   for(int i = 0; i < m_Tree->GetEntries(); i++) {
     m_Tree->GetEntry(i);
     int iDcyTr = m_Tree->GetGeneratorKinematics().iDcyTr;
@@ -38,9 +42,9 @@ void AnalysePeakingBackgrounds::CalculatePeakingBackgrounds(const std::string &F
 	continue;
       }
       if(m_PeakingBackgrounds.find(iDcyTr) != m_PeakingBackgrounds.end()) {
-	m_PeakingBackgrounds.at(iDcyTr)[Bin]++;
+	m_PeakingBackgrounds.at(iDcyTr)[Bin] += m_ScaleFactors.at(iDcyTr)/MCScale;
       } else {
-	m_OtherBackgrounds[Bin]++;
+	m_OtherBackgrounds[Bin] += 1.0/MCScale;
       }
     }
   }
