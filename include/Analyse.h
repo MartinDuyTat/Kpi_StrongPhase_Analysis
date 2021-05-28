@@ -22,9 +22,11 @@ class Analyse {
      */
     int ArrayIndex(int i) const;
     /**
-     * Determine MBC region for the current event
+     * Determine energy region for the current event
+     * For fully reconstructed double tags, this is the 2D MBC plane
+     * For partially reconstructed tags, the reconstructed tag must have MBC between 1.86 and 1.87 GeV, and the missing mass/energy for the partially reconstructed tag
      */
-    char DetermineMBCRegion() const;
+    char DetermineEnergyRegion() const;
     /**
      * Get reconstructed bin number for the current event
      */

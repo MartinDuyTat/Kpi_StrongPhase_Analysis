@@ -37,7 +37,7 @@ void AnalysePeakingBackgrounds::CalculatePeakingBackgrounds(const std::string &F
     m_Tree->GetEntry(i);
     int iDcyTr = m_Tree->GetGeneratorKinematics().iDcyTr;
     if(std::find(m_SignalComponents.begin(), m_SignalComponents.end(), iDcyTr) == m_SignalComponents.end()) {
-      if(DetermineMBCRegion() != 'S') {
+      if(DetermineEnergyRegion() != 'S') {
 	continue;
       }
       int Bin = DetermineReconstructedBinNumber();

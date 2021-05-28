@@ -43,5 +43,6 @@ void AnalyseFinalYields::CalculateFinalYields(const std::string &Filename) const
   for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
     Outfile << FinalYields[-i] << " ";
   }
+  Outfile << "\n";
   Outfile.close();
 }

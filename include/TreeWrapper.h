@@ -29,17 +29,25 @@ struct ReconstructedKinematics {
    */
   double SignalMBC;
   /**
+   * Missing mass squared on the signal side
+   */
+  double SignalMMiss2;
+  /**
    * Beam constrained mass on the signal side
    */
   double TagMBC;
   /**
-   * \f$K_S^0\f$ momentum
+   * Missing energy minus missing momentum on the tag side
    */
-  TLorentzVector KS_P;
+  double TagUMiss;
   /**
-   * \f$K_S^0\f$ momentum after Kalman kinematic fit
+   * \f$K^0\f$ momentum
    */
-  TLorentzVector KSKalman_P;
+  TLorentzVector K0_P;
+  /**
+   * \f$K^0\f$ momentum after Kalman kinematic fit
+   */
+  TLorentzVector K0Kalman_P;
   /**
    * \f$K^+\f$ momentum
    */
@@ -128,6 +136,14 @@ class TreeWrapper {
      * @param i Entry number
      */
     void GetEntry(int i);
+    /**
+     * Get signal mode
+     */
+    std::string GetSignalMode() const;
+    /**
+     * Get tag mode
+     */
+    std::string GetTagMode() const;
   private:
     /**
      * TChain object containing all data
@@ -137,6 +153,14 @@ class TreeWrapper {
      * TEntryList object that only selects events passing the selection cuts
      */
     TEntryList *m_elist;
+    /**
+     * Signal mode, "KSKK" or "KLKK"
+     */
+    std::string m_SignalMode;
+    /**
+     * Tag mode, "Kpi", "Kpipi0", "Kpipipi" or "KeNu"
+     */
+    std::string m_TagMode;
     /**
      * Struct with reconstructed kinematics
      */

@@ -16,9 +16,9 @@ void AnalyseBinMigration::CalculateBinMigrationYields(const std::string &Filenam
     }
     int ReconstructedBinNumber = DetermineReconstructedBinNumber();
     if(ReconstructedBinNumber == 0) {
-      continue;
+      ReconstructedBinNumber = DetermineMappedReconstructedBinNumber();
     }
-    char Region = DetermineMBCRegion();
+    char Region = DetermineEnergyRegion();
     if(Region != 'S') {
       continue;
     }

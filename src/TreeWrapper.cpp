@@ -2,6 +2,7 @@
 
 #include<fstream>
 #include<string>
+#include<stdexcept>
 #include"TreeWrapper.h"
 #include"TEntryList.h"
 #include"TCut.h"
@@ -24,6 +25,24 @@ TreeWrapper::TreeWrapper(const std::string &Filename, const std::string &TreeNam
   m_Chain.Draw(">> elist", Cuts, "entrylist");
   m_elist = (TEntryList*)gDirectory->Get("elist");
   m_Chain.SetEntryList(m_elist);
+  if(DataType != "TruthTuple") {
+    if(TreeName.find("KSKK") != std::string::npos) {
+      m_SignalMode = "KSKK";
+    } else if(TreeName.find("KLKK") != std::string::npos) {
+      m_SignalMode = "KLKK";
+    } else {
+      throw std::runtime_error("Unknown signal mode");
+    }
+    if(TreeName.find("KeNu") != std::string::npos) {
+      m_TagMode = "KeNu";
+    } else if(TreeName.find("Kpipipi") != std::string::npos) {
+      m_TagMode = "Kpipipi";
+    } else if(TreeName.find("Kpipi0") != std::string::npos) {
+      m_TagMode = "Kpipi0";
+    } else if(TreeName.find("Kpi") != std::string::npos) {
+      m_TagMode = "Kpi";
+    }
+  }
   SetBranchAddresses(DataType);
 }
 
@@ -33,12 +52,35 @@ void TreeWrapper::SetBranchAddresses(const std::string &DataType) {
   if(RecData) {
     m_Chain.SetBranchAddress("SignalKalmanFitSuccess", &m_RecKinematics.KalmanFitSuccess);
     m_Chain.SetBranchAddress("TagKCharge", &m_RecKinematics.TagKCharge);
-    m_Chain.SetBranchAddress("SignalMBC", &m_RecKinematics.SignalMBC);
-    m_Chain.SetBranchAddress("TagMBC", &m_RecKinematics.TagMBC);
-    m_Chain.SetBranchAddress("SignalKSpx", &m_RecKinematics.KS_P[0]);
-    m_Chain.SetBranchAddress("SignalKSpy", &m_RecKinematics.KS_P[1]);
-    m_Chain.SetBranchAddress("SignalKSpz", &m_RecKinematics.KS_P[2]);
-    m_Chain.SetBranchAddress("SignalKSenergy", &m_RecKinematics.KS_P[3]);
+    if(m_SignalMode == "KSKK") {
+      m_Chain.SetBranchAddress("SignalMBC", &m_RecKinematics.SignalMBC);
+    } else if(m_SignalMode == "KLKK") {
+      m_Chain.SetBranchAddress("SignalMMiss2", &m_RecKinematics.SignalMMiss2);
+    }
+    if(m_TagMode != "KeNu") {
+      m_Chain.SetBranchAddress("TagMBC", &m_RecKinematics.TagMBC);
+    } else {
+      m_Chain.SetBranchAddress("TagUMiss", &m_RecKinematics.TagUMiss);
+    }
+    if(m_SignalMode == "KSKK") {
+      m_Chain.SetBranchAddress("SignalKSpx", &m_RecKinematics.K0_P[0]);
+      m_Chain.SetBranchAddress("SignalKSpy", &m_RecKinematics.K0_P[1]);
+      m_Chain.SetBranchAddress("SignalKSpz", &m_RecKinematics.K0_P[2]);
+      m_Chain.SetBranchAddress("SignalKSenergy", &m_RecKinematics.K0_P[3]);
+      m_Chain.SetBranchAddress("SignalKSpxKalmanFit", &m_RecKinematics.K0Kalman_P[0]);
+      m_Chain.SetBranchAddress("SignalKSpyKalmanFit", &m_RecKinematics.K0Kalman_P[1]);
+      m_Chain.SetBranchAddress("SignalKSpzKalmanFit", &m_RecKinematics.K0Kalman_P[2]);
+      m_Chain.SetBranchAddress("SignalKSenergyKalmanFit", &m_RecKinematics.K0Kalman_P[3]);
+    } else if (m_SignalMode == "KLKK") {
+      m_Chain.SetBranchAddress("SignalKLpx", &m_RecKinematics.K0_P[0]);
+      m_Chain.SetBranchAddress("SignalKLpy", &m_RecKinematics.K0_P[1]);
+      m_Chain.SetBranchAddress("SignalKLpz", &m_RecKinematics.K0_P[2]);
+      m_Chain.SetBranchAddress("SignalKLenergy", &m_RecKinematics.K0_P[3]);
+      m_Chain.SetBranchAddress("SignalKLpxKalmanFit", &m_RecKinematics.K0Kalman_P[0]);
+      m_Chain.SetBranchAddress("SignalKLpyKalmanFit", &m_RecKinematics.K0Kalman_P[1]);
+      m_Chain.SetBranchAddress("SignalKLpzKalmanFit", &m_RecKinematics.K0Kalman_P[2]);
+      m_Chain.SetBranchAddress("SignalKLenergyKalmanFit", &m_RecKinematics.K0Kalman_P[3]);
+    }
     m_Chain.SetBranchAddress("SignalKPluspx", &m_RecKinematics.KPlus_P[0]);
     m_Chain.SetBranchAddress("SignalKPluspy", &m_RecKinematics.KPlus_P[1]);
     m_Chain.SetBranchAddress("SignalKPluspz", &m_RecKinematics.KPlus_P[2]);
@@ -47,10 +89,6 @@ void TreeWrapper::SetBranchAddresses(const std::string &DataType) {
     m_Chain.SetBranchAddress("SignalKMinuspy", &m_RecKinematics.KMinus_P[1]);
     m_Chain.SetBranchAddress("SignalKMinuspz", &m_RecKinematics.KMinus_P[2]);
     m_Chain.SetBranchAddress("SignalKMinusenergy", &m_RecKinematics.KMinus_P[3]);
-    m_Chain.SetBranchAddress("SignalKSpxKalmanFit", &m_RecKinematics.KSKalman_P[0]);
-    m_Chain.SetBranchAddress("SignalKSpyKalmanFit", &m_RecKinematics.KSKalman_P[1]);
-    m_Chain.SetBranchAddress("SignalKSpzKalmanFit", &m_RecKinematics.KSKalman_P[2]);
-    m_Chain.SetBranchAddress("SignalKSenergyKalmanFit", &m_RecKinematics.KSKalman_P[3]);
     m_Chain.SetBranchAddress("SignalKPluspxKalmanFit", &m_RecKinematics.KPlusKalman_P[0]);
     m_Chain.SetBranchAddress("SignalKPluspyKalmanFit", &m_RecKinematics.KPlusKalman_P[1]);
     m_Chain.SetBranchAddress("SignalKPluspzKalmanFit", &m_RecKinematics.KPlusKalman_P[2]);
@@ -88,4 +126,12 @@ int TreeWrapper::GetEntries() const {
 
 void TreeWrapper::GetEntry(int i) {
   m_Chain.GetEntry(m_Chain.GetEntryNumber(i));
+}
+
+std::string TreeWrapper::GetSignalMode() const {
+  return m_SignalMode;
+}
+
+std::string TreeWrapper::GetTagMode() const {
+  return m_TagMode;
 }
