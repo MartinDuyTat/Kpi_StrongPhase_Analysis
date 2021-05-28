@@ -1,5 +1,7 @@
 // Martin Duy Tat 19th May 2021
 
+#include<stdexcept>
+#include<utility>
 #include"BinningScheme.h"
 #include"TFile.h"
 
@@ -18,6 +20,35 @@ int BinningScheme::GetBinNumber(double M2Plus, double M2Minus, int KCharge) cons
   return BinNumber;
 }
 
+int BinningScheme::GetMappedBinNumber(double M2Plus, double M2Minus, int KCharge) const {
+  int CP = M2Plus > M2Minus ? +1 : -1;
+  // First get initial bin number
+  int x = m_BinningScheme->GetXaxis()->FindBin(M2Plus);
+  int y = m_BinningScheme->GetYaxis()->FindBin(M2Minus);
+  int i = 1;
+  // Loop in circles around this point until reaching the Dalitz boundary
+  while(true) {
+    if(i > 1000) {
+      throw std::runtime_error("Dalitz point too far outside phase space");
+    }
+    for(int j = 0; j <= i; j++) {
+      // All possible combinations of displacements at the same distance
+      std::vector<std::pair<int, int>> BinList{{i, j}, {i, -j}, {-i, j}, {-i, -j}, {j, i}, {j, -i}, {\
+-j, i}, {-j, -i}};
+      for(auto iter = BinList.begin(); iter != BinList.end(); iter++) {
+        int NewBin = static_cast<int>(m_BinningScheme->GetBinContent(x + iter->first, y + iter->second));
+	// Once we reach the Dalitz boundary the bin number is non-zero
+        if(NewBin != 0) {
+	  NewBin *= KCharge*CP;
+	  return NewBin;
+        }
+      }
+    }
+    i++;
+  }
+}
+
 int BinningScheme::GetNumberBins() const {
   return m_NumberBins;
 }
+

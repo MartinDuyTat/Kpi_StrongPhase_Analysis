@@ -22,6 +22,14 @@ class BinningScheme {
      */
     int GetBinNumber(double M2Plus, double M2Minus, int KCharge) const;
     /**
+     * Get the closest bin number, assuming the initial point is outside the Dalitz plot
+     * Algorithm by Sophia Vaughan
+     * @param M2Plus Invariant mass of \f$K_S^0\f$ and \f$K^+\f$
+     * @param M2Plus Invariant mass of \f$K_S^0\f$ and \f$K^-\f$
+     * @param KCharge Charge of the tag kaon
+     */
+    int GetMappedBinNumber(double M2Plus, double M2Minus, int KCharge) const;
+    /**
      * Get number of bins
      */
     int GetNumberBins() const;

@@ -48,15 +48,15 @@ double AnalyseYield::GetBackgroundSubtractedYield(int Bin) const {
 void AnalyseYield::CalculateDoubleTagYields(const TMatrixT<double> &BinMigrationMatrix, const std::string &Filename) {
   for(int i = 0; i < m_Tree->GetEntries(); i++) {
     m_Tree->GetEntry(i);
-    int BinNumber = DetermineReconstructedBinNumber();
-    if(BinNumber == 0) {
-      m_EventsOutsidePhaseSpace++;
-      continue;
-    }
     char Region = DetermineMBCRegion();
     if(Region == 'F') {
       m_EventsOutsideMBCSpace++;
       continue;
+    }
+    int BinNumber = DetermineReconstructedBinNumber();
+    if(BinNumber == 0) {
+      m_EventsOutsidePhaseSpace++;
+      BinNumber = DetermineMappedReconstructedBinNumber();
     }
     m_Yields.at(Region)[BinNumber]++;
   }

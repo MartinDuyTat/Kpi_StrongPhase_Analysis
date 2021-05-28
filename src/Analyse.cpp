@@ -43,8 +43,14 @@ char Analyse::DetermineMBCRegion() const {
 
 int Analyse::DetermineReconstructedBinNumber() const {
   ReconstructedKinematics RecKinematics = m_Tree->GetReconstructedKinematics();
-  double M2Plus = (RecKinematics.KSKalman_P + RecKinematics.KPlusKalman_P).M2();
-  double M2Minus = (RecKinematics.KSKalman_P + RecKinematics.KMinusKalman_P).M2();
+  double M2Plus, M2Minus;
+  if(RecKinematics.KalmanFitSuccess) {
+    M2Plus = (RecKinematics.KSKalman_P + RecKinematics.KPlusKalman_P).M2();
+    M2Minus = (RecKinematics.KSKalman_P + RecKinematics.KMinusKalman_P).M2();
+  } else {
+    M2Plus = (RecKinematics.KS_P + RecKinematics.KPlus_P).M2();
+    M2Minus = (RecKinematics.KS_P + RecKinematics.KMinus_P).M2();
+  }
   int KCharge = RecKinematics.TagKCharge;
   int BinNumber = m_BinningScheme.GetBinNumber(M2Plus, M2Minus, KCharge);
   if(BinNumber == 0) {
@@ -54,6 +60,21 @@ int Analyse::DetermineReconstructedBinNumber() const {
   } else {
     return BinNumber;
   }
+}
+
+int Analyse::DetermineMappedReconstructedBinNumber() const {
+  ReconstructedKinematics RecKinematics = m_Tree->GetReconstructedKinematics();
+  double M2Plus, M2Minus;
+  if(RecKinematics.KalmanFitSuccess) {
+    M2Plus = (RecKinematics.KSKalman_P + RecKinematics.KPlusKalman_P).M2();
+    M2Minus = (RecKinematics.KSKalman_P + RecKinematics.KMinusKalman_P).M2();
+  } else {
+    M2Plus = (RecKinematics.KS_P + RecKinematics.KPlus_P).M2();
+    M2Minus = (RecKinematics.KS_P + RecKinematics.KMinus_P).M2();
+  }
+  int KCharge = RecKinematics.TagKCharge;
+  int BinNumber = m_BinningScheme.GetMappedBinNumber(M2Plus, M2Minus, KCharge);
+  return BinNumber;
 }
 
 int Analyse::DetermineGeneratorBinNumber() const {

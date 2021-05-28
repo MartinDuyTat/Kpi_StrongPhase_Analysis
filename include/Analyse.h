@@ -30,6 +30,10 @@ class Analyse {
      */
     int DetermineReconstructedBinNumber() const;
     /**
+     * Determine closest bin number, assuming the event is outside the Dalitz phase space
+     */
+    int DetermineMappedReconstructedBinNumber() const;
+    /**
      * Get generated bin number
      */
     int DetermineGeneratorBinNumber() const;
