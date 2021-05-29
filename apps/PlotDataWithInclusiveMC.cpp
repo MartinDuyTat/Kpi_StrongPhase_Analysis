@@ -125,11 +125,21 @@ int main(int argc, char *argv[]) {
   TTree *t13 = nullptr;
   f13.GetObject(KpiSettings::Get().GetString("TreeName").c_str(), t13);
   std::string Cut13 = std::string("(") + std::string(Cuts.GetTitle()) + std::string(")*2.4/") + KpiSettings::Get().GetString("D0D0LuminosityScale");
+  if(KpiSettings::Get().GetString("RemovePeaking") == "True") {
+    Cut13 += std::string("*(");
+    std::ifstream iDcyTrFile(KpiSettings::Get().GetString("iDcyTrNumbersFile"));
+    int iDcyTr;
+    while(iDcyTrFile >> iDcyTr) {
+      Cut13 += std::string("iDcyTr != ") + std::to_string(iDcyTr) + std::string(" &&");
+    }
+    Cut13 += std::string(" iDcyTr >= 0)");
+    iDcyTrFile.close();
+  }
   TH1D h13("h13", "D^{0}#bar{D^{0}}", 100, KpiSettings::Get().GetDouble("Min"), KpiSettings::Get().GetDouble("Max"));
   t13->Draw((KpiSettings::Get().GetString("PlotVariable") + std::string(" >> h13")).c_str(), Cut13.c_str(), "goff");
   std::ifstream DataFiles(KpiSettings::Get().GetString("DataFiles"));
   TChain Chain(KpiSettings::Get().GetString("TreeName").c_str());
-  while(std::getline(DataFiles, line)) {
+  while(std::getline(DataFiles, line) && KpiSettings::Get().GetString("PlotData") == "True") {
     Chain.Add(line.c_str());
   }
   DataFiles.close();
