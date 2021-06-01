@@ -46,9 +46,9 @@ class AnalyseYield: public Analyse {
      */
     bool m_SubtractBackground;
     /**
-     * List of peaking background in each bin
+     * List of peaking background in each bin and each region
      */
-    BinVector<double> m_PeakingBackground;
+    std::map<char, BinVector<double>> m_PeakingBackground;
     /**
      * Events outside of the MBC region
      */
