@@ -49,7 +49,7 @@ char Analyse::DetermineEnergyRegion() const {
       } else if(TagUMiss > -0.30 && TagUMiss < -0.05) {
 	return 'L';
       } else if(TagUMiss > 0.05 && TagUMiss < 0.30) {
-	return 'L';
+	return 'H';
       } else {
 	return 'F';
       }

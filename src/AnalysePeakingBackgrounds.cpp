@@ -47,12 +47,12 @@ void AnalysePeakingBackgrounds::CalculatePeakingBackgrounds(const std::string &F
     int iDcyTr = m_Tree->GetGeneratorKinematics().iDcyTr;
     if(std::find(m_SignalComponents.begin(), m_SignalComponents.end(), iDcyTr) == m_SignalComponents.end()) {
       char Region = DetermineEnergyRegion();
-      if(m_Tree->GetSignalMode() == "KSKK" && m_Tree->GetTagMode() != "KeNu" && Region != 'S') {
+      if((m_Tree->GetSignalMode() == "KSKK" && m_Tree->GetTagMode() != "KeNu") && Region != 'S') {
 	continue;
       }
       int Bin = DetermineReconstructedBinNumber();
       if(Bin == 0) {
-	continue;
+	DetermineMappedReconstructedBinNumber();
       }
       if(m_PeakingBackgrounds.find({iDcyTr, Region}) != m_PeakingBackgrounds.end()) {
 	m_PeakingBackgrounds.at({iDcyTr, Region})[Bin] += m_ScaleFactors.at(iDcyTr)/MCScale;
