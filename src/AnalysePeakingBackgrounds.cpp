@@ -21,11 +21,11 @@ AnalysePeakingBackgrounds::AnalysePeakingBackgrounds(TreeWrapper *Tree, const st
     m_SignalComponents.push_back(iDcyTr);
   }
   m_OtherBackgrounds.insert({'S', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
-  if(m_Tree->GetSignalMode() == "KSKK" && m_Tree->GetTagMode() != "KeNu") {
+  if(!(m_Tree->GetSignalMode() == "KSKK" && m_Tree->GetTagMode() != "KeNu")) {
     m_OtherBackgrounds.insert({'L', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
     m_OtherBackgrounds.insert({'H', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
   }
-  while(ss2 >> iDcyTr) {
+  while(ss2 >> iDcyTr && line2 != "") {
     double ScaleFactor;
     ss3 >> ScaleFactor;
     m_PeakingBackgrounds.insert({{iDcyTr, 'S'}, BinVector<double>(true, m_BinningScheme.GetNumberBins())});
@@ -84,6 +84,7 @@ void AnalysePeakingBackgrounds::SavePeakingBackgrounds(const std::string &Filena
     for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
       Outfile << iter->second[-i] << " ";
     }
+    Outfile << "\n";
   }
   Outfile.close();
 }
