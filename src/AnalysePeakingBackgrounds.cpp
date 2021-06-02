@@ -31,7 +31,7 @@ AnalysePeakingBackgrounds::AnalysePeakingBackgrounds(TreeWrapper *Tree, const st
     m_PeakingBackgrounds.insert({{iDcyTr, 'S'}, BinVector<double>(true, m_BinningScheme.GetNumberBins())});
     if(!(m_Tree->GetSignalMode() == "KSKK" && m_Tree->GetTagMode() != "KeNu")) {
       m_PeakingBackgrounds.insert({{iDcyTr, 'L'}, BinVector<double>(true, m_BinningScheme.GetNumberBins())});
-      m_PeakingBackgrounds.insert({{iDcyTr, 'U'}, BinVector<double>(true, m_BinningScheme.GetNumberBins())});
+      m_PeakingBackgrounds.insert({{iDcyTr, 'H'}, BinVector<double>(true, m_BinningScheme.GetNumberBins())});
     }
     m_ScaleFactors.insert({iDcyTr, ScaleFactor});
   }
