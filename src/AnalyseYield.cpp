@@ -31,6 +31,9 @@ AnalyseYield::AnalyseYield(TreeWrapper *Tree, bool SubtractBackground, const std
       double Background;
       std::stringstream ss(line);
       ss >> iDcyTr >> Region;
+      if(m_Tree->GetSignalMode() == "KSKK" && m_Tree->GetTagMode() != "KeNu" && iDcyTr == "Other") {
+	continue;
+      }
       for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
 	ss >> Background;
 	m_PeakingBackground.at(Region)[i] += Background;

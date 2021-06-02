@@ -9,6 +9,7 @@
 #define ANALYSEPEAKINGBACKGROUNDS
 
 #include<map>
+#include<utility>
 #include<string>
 #include<vector>
 #include"BinVector.h"
@@ -36,9 +37,9 @@ class AnalysePeakingBackgrounds: public Analyse {
     void SavePeakingBackgrounds(const std::string &Filename) const;
   private:
     /**
-     * Map containing all iDcyTr numbers and the binned yields
+     * Map containing all iDcyTr numbers and the binned yields for each region
      */
-    std::map<int, BinVector<double>> m_PeakingBackgrounds;
+    std::map<std::pair<int, char>, BinVector<double>> m_PeakingBackgrounds;
     /**
      * Scale factors to the yields of different modes to correct for different branching ratios in MC
      */
@@ -46,7 +47,7 @@ class AnalysePeakingBackgrounds: public Analyse {
     /**
      * Binned yields of other backgrounds not listed
      */
-    BinVector<double> m_OtherBackgrounds;
+    std::map<char, BinVector<double>> m_OtherBackgrounds;
     /**
      * List of signal iDcyTr numbers, these are ignored!
      */
