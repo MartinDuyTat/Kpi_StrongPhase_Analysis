@@ -170,5 +170,10 @@ int Analyse::DetermineGeneratorBinNumber() const {
   } else {
     KCharge = std::find(D0Daughters.begin(), D0Daughters.end(), -321) != D0barDaughters.end() ? -1 : +1;
   }
-  return m_BinningScheme.GetBinNumber(M2Plus, M2Minus, KCharge);
+  int BinNumber = m_BinningScheme.GetBinNumber(M2Plus, M2Minus, KCharge);
+  if(BinNumber != 0) {
+    return BinNumber;
+  } else {
+    return m_BinningScheme.GetMappedBinNumber(M2Plus, M2Minus, KCharge);
+  }
 }

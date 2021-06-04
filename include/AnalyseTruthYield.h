@@ -28,10 +28,6 @@ class AnalyseTruthYield: public Analyse {
      * Double tag yields from the generator
      */
     BinVector<double> m_GeneratorYields;
-    /**
-     * Number of events outside of phase space
-     */
-    int m_EventsOutsidePhaseSpace;
 };
 
 #endif
