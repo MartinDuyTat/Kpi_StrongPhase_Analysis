@@ -7,6 +7,8 @@
 #define ANALYSEYIELD
 
 #include<map>
+#include<utility>
+#include<vector>
 #include<string>
 #include"BinVector.h"
 #include"Analyse.h"
@@ -36,11 +38,20 @@ class AnalyseYield: public Analyse {
      * @param Filename Filename where the yields are saved
      */
     void SaveFinalYields(const TMatrixT<double> &BinMigrationMatrix, const std::string &Filename) const;
+    /**
+     * Function that plots the Dalitz distribution of each bin and saves it as a .png file
+     * @param Filename First part of the filename of the .png files, the bin number of file extension is appended
+     */
+    void SaveDalitzDistributions(const std::string &Filename) const;
   private:
     /**
      * Map with the yields in each bin and each region
      */
     std::map<char, BinVector<double>> m_Yields;
+    /**
+     * Vector of Dalitz positions of all events in each bin
+     */
+    BinVector<std::vector<std::pair<double, double>>> m_DalitzCoordinates;
     /**
      * If true, sideband subtraction is used to remove backgrounds
      */

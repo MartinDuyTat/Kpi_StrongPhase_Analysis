@@ -2,8 +2,10 @@
 
 #include<stdexcept>
 #include<utility>
+#include<string>
 #include"BinningScheme.h"
 #include"TFile.h"
+#include"TStyle.h"
 
 BinningScheme::BinningScheme(): m_NumberBins(2) {
   TFile BinningFile((std::string(BINNING_SCHEME_DIR) + std::string("KsKK_2bins.root")).c_str(), "READ");
@@ -33,8 +35,7 @@ int BinningScheme::GetMappedBinNumber(double M2Plus, double M2Minus, int KCharge
     }
     for(int j = 0; j <= i; j++) {
       // All possible combinations of displacements at the same distance
-      std::vector<std::pair<int, int>> BinList{{i, j}, {i, -j}, {-i, j}, {-i, -j}, {j, i}, {j, -i}, {\
--j, i}, {-j, -i}};
+      std::vector<std::pair<int, int>> BinList{{i, j}, {i, -j}, {-i, j}, {-i, -j}, {j, i}, {j, -i}, {-j, i}, {-j, -i}};
       for(auto iter = BinList.begin(); iter != BinList.end(); iter++) {
         int NewBin = static_cast<int>(m_BinningScheme->GetBinContent(x + iter->first, y + iter->second));
 	// Once we reach the Dalitz boundary the bin number is non-zero
@@ -52,3 +53,8 @@ int BinningScheme::GetNumberBins() const {
   return m_NumberBins;
 }
 
+void BinningScheme::Draw(const std::string &DrawOptions) const {
+  int palette[3] = {kWhite, kBlue, kRed};
+  gStyle->SetPalette(3, palette);
+  m_BinningScheme->Draw(DrawOptions.c_str());
+}

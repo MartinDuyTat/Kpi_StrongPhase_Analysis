@@ -1,14 +1,22 @@
 // Martin Duy Tat 19th May 2021
 
 #include<string>
+#include<vector>
+#include<utility>
+#include<algorithm>
 #include<fstream>
 #include<sstream>
+#include"BinVector.h"
 #include"Settings.h"
 #include"AnalyseYield.h"
+#include"TreeWrapper.h"
 #include"Analyse.h"
 #include"TMatrix.h"
+#include"TMath.h"
+#include"TGraph.h"
+#include"TCanvas.h"
 
-AnalyseYield::AnalyseYield(TreeWrapper *Tree, bool SubtractBackground, const std::string &PeakingBackgroundFile): Analyse(Tree), m_SubtractBackground(SubtractBackground), m_EventsOutsideMBCSpace(0), m_EventsOutsidePhaseSpace(0) {
+AnalyseYield::AnalyseYield(TreeWrapper *Tree, bool SubtractBackground, const std::string &PeakingBackgroundFile): Analyse(Tree), m_DalitzCoordinates(BinVector<std::vector<std::pair<double, double>>>(true, m_BinningScheme.GetNumberBins())), m_SubtractBackground(SubtractBackground), m_EventsOutsideMBCSpace(0), m_EventsOutsidePhaseSpace(0) {
   m_Yields.insert({'S', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
   m_PeakingBackground.insert({'S', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
   if(m_Tree->GetSignalMode() == "KSKK" && m_Tree->GetTagMode() != "KeNu") {
@@ -80,6 +88,21 @@ void AnalyseYield::CalculateDoubleTagYields(const TMatrixT<double> &BinMigration
       BinNumber = DetermineMappedReconstructedBinNumber();
     }
     m_Yields.at(Region)[BinNumber]++;
+    if(Region == 'S') {
+      ReconstructedKinematics RecKinematics = m_Tree->GetReconstructedKinematics();
+      double M2Plus, M2Minus;
+      if(RecKinematics.KalmanFitSuccess == 1) {
+	M2Plus = (RecKinematics.K0Kalman_P + RecKinematics.KPlusKalman_P).M2();
+	M2Minus = (RecKinematics.K0Kalman_P + RecKinematics.KMinusKalman_P).M2();
+      } else {
+	M2Plus = (RecKinematics.K0_P + RecKinematics.KPlus_P).M2();
+	M2Minus = (RecKinematics.K0_P + RecKinematics.KMinus_P).M2();
+      }
+      if(RecKinematics.TagKCharge < 0) {
+	std::swap(M2Plus, M2Minus);
+      }
+      m_DalitzCoordinates[BinNumber].push_back(std::pair<double, double>{M2Plus, M2Minus});
+    }
   }
   SaveFinalYields(BinMigrationMatrix, Filename);
 }
@@ -130,5 +153,28 @@ void AnalyseYield::SaveFinalYields(const TMatrixT<double> &BinMigrationMatrix, c
       ResultsFile << m_Yields.at(R)[-i] << " ";
     }
     ResultsFile << "\n";
+  }
+}
+
+void AnalyseYield::SaveDalitzDistributions(const std::string &Filename) const {
+  std::vector<int> BinList;
+  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+    BinList.push_back(i);
+  }
+  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+    BinList.push_back(-i);
+  }
+  for(auto iter = BinList.begin(); iter != BinList.end(); iter++) {
+    std::string DalitzFilename = Filename + std::string(*iter > 0 ? "p" : "m") + std::to_string(TMath::Abs(*iter)) + std::string(".png");
+    std::vector<double> M2Plus, M2Minus;
+    for(auto Dalitz_position : m_DalitzCoordinates[*iter]) {
+      M2Plus.push_back(Dalitz_position.first);
+      M2Minus.push_back(Dalitz_position.second);
+    }
+    TCanvas c("c", "c", 900, 900);
+    m_BinningScheme.Draw("col");
+    TGraph gr(M2Plus.size(), M2Plus.data(), M2Minus.data());
+    gr.Draw("SAME *");
+    c.SaveAs(DalitzFilename.c_str());
   }
 }

@@ -6,6 +6,7 @@
 #ifndef BINNINGSCHEME
 #define BINNINGSCHEME
 
+#include<string>
 #include"TH2F.h"
 
 class BinningScheme {
@@ -33,6 +34,10 @@ class BinningScheme {
      * Get number of bins
      */
     int GetNumberBins() const;
+    /**
+     * Draw binning on a TCanvas
+     */
+    void Draw(const std::string &DrawOptions) const;
   private:
     /**
      * 2D histogram that contains the binning scheme
