@@ -22,7 +22,7 @@ void AnalyseBinMigration::CalculateBinMigrationYields(const std::string &Filenam
     if(Region != 'S') {
       continue;
     }
-    m_BinYields[ArrayIndex(GeneratorBinNumber)][ArrayIndex(ReconstructedBinNumber)]++;
+    m_BinYields[ArrayIndex(ReconstructedBinNumber)][ArrayIndex(GeneratorBinNumber)]++;
   }
   SaveResults(Filename);
 }
@@ -39,13 +39,13 @@ void AnalyseBinMigration::SaveResults(const std::string &Filename) const {
 
 TMatrixT<double> AnalyseBinMigration::GetBinMigrationMatrix() const {
   TMatrixT<double> BinMigrationMatrix = m_BinYields;
-  for(int i = 0; i < m_BinYields.GetNrows(); i++) {
+  for(int i = 0; i < m_BinYields.GetNcols(); i++) {
     double sum = 0.0;
-    for(int j = 0; j < m_BinYields.GetNcols(); j++) {
-      sum += m_BinYields[i][j];
+    for(int j = 0; j < m_BinYields.GetNrows(); j++) {
+      sum += m_BinYields[j][i];
     }
-    for(int j = 0; j < m_BinYields.GetNcols(); j++) {
-      BinMigrationMatrix[i][j] = m_BinYields[i][j]/sum;
+    for(int j = 0; j < m_BinYields.GetNrows(); j++) {
+      BinMigrationMatrix[j][i] = m_BinYields[j][i]/sum;
     }
   }
   return BinMigrationMatrix.Invert();

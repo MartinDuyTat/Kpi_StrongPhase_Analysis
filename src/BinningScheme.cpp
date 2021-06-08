@@ -53,8 +53,9 @@ int BinningScheme::GetNumberBins() const {
   return m_NumberBins;
 }
 
-void BinningScheme::Draw(const std::string &DrawOptions) const {
-  int palette[3] = {kWhite, kBlue, kRed};
+void BinningScheme::Draw(const std::string &DrawOptions, const std::string &PlotTitle) const {
+  int palette[3] = {kWhite, kOrange - 2, kOrange - 3};
   gStyle->SetPalette(3, palette);
+  m_BinningScheme->SetTitle(PlotTitle.c_str());
   m_BinningScheme->Draw(DrawOptions.c_str());
 }

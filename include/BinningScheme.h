@@ -37,7 +37,7 @@ class BinningScheme {
     /**
      * Draw binning on a TCanvas
      */
-    void Draw(const std::string &DrawOptions) const;
+    void Draw(const std::string &DrawOptions, const std::string &PlotTitle) const;
   private:
     /**
      * 2D histogram that contains the binning scheme

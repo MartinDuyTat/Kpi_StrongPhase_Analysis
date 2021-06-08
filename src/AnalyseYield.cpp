@@ -15,6 +15,7 @@
 #include"TMath.h"
 #include"TGraph.h"
 #include"TCanvas.h"
+#include"TLine.h"
 
 AnalyseYield::AnalyseYield(TreeWrapper *Tree, bool SubtractBackground, const std::string &PeakingBackgroundFile): Analyse(Tree), m_DalitzCoordinates(BinVector<std::vector<std::pair<double, double>>>(true, m_BinningScheme.GetNumberBins())), m_SubtractBackground(SubtractBackground), m_EventsOutsideMBCSpace(0), m_EventsOutsidePhaseSpace(0) {
   m_Yields.insert({'S', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
@@ -172,9 +173,12 @@ void AnalyseYield::SaveDalitzDistributions(const std::string &Filename) const {
       M2Minus.push_back(Dalitz_position.second);
     }
     TCanvas c("c", "c", 900, 900);
-    m_BinningScheme.Draw("col");
+    std::string PlotTitle = std::string("Bin ") + std::string(*iter > 0 ? "+" : "-") + std::to_string(TMath::Abs(*iter));
+    m_BinningScheme.Draw("col", PlotTitle);
     TGraph gr(M2Plus.size(), M2Plus.data(), M2Minus.data());
     gr.Draw("SAME *");
+    TLine Line(0.983, 0.983, 1.88, 1.88);
+    Line.Draw("SAME");
     c.SaveAs(DalitzFilename.c_str());
   }
 }

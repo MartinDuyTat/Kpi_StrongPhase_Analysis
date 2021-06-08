@@ -80,7 +80,7 @@ char Analyse::DetermineEnergyRegion() const {
 int Analyse::DetermineReconstructedBinNumber() const {
   ReconstructedKinematics RecKinematics = m_Tree->GetReconstructedKinematics();
   double M2Plus, M2Minus;
-  if(RecKinematics.KalmanFitSuccess) {
+  if(RecKinematics.KalmanFitSuccess == 1) {
     M2Plus = (RecKinematics.K0Kalman_P + RecKinematics.KPlusKalman_P).M2();
     M2Minus = (RecKinematics.K0Kalman_P + RecKinematics.KMinusKalman_P).M2();
   } else {
@@ -101,7 +101,7 @@ int Analyse::DetermineReconstructedBinNumber() const {
 int Analyse::DetermineMappedReconstructedBinNumber() const {
   ReconstructedKinematics RecKinematics = m_Tree->GetReconstructedKinematics();
   double M2Plus, M2Minus;
-  if(RecKinematics.KalmanFitSuccess) {
+  if(RecKinematics.KalmanFitSuccess == 1) {
     M2Plus = (RecKinematics.K0Kalman_P + RecKinematics.KPlusKalman_P).M2();
     M2Minus = (RecKinematics.K0Kalman_P + RecKinematics.KMinusKalman_P).M2();
   } else {
