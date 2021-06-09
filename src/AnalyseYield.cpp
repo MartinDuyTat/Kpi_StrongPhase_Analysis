@@ -56,7 +56,8 @@ AnalyseYield::AnalyseYield(TreeWrapper *Tree, bool SubtractBackground, const std
   }
 }
 
-double AnalyseYield::GetBackgroundSubtractedYield(int Bin) const {
+std::pair<double, double> AnalyseYield::GetBackgroundSubtractedYield(int Bin) const {
+  double LuminosityScale = KpiSettings::Get().GetDouble("LuminosityScale");
   if(m_Tree->GetSignalMode() == "KSKK" && m_Tree->GetTagMode() != "KeNu") {
     // Area in beam constrained 2D plane
     double A_S = 10*10;
@@ -64,14 +65,22 @@ double AnalyseYield::GetBackgroundSubtractedYield(int Bin) const {
     double A_B = 25*10;
     double A_D = 19.5*19.5;
     double A_C = 25*25 - 21.5*21.5;
-    double Background = (A_S/A_D)*m_Yields.at('D')[Bin] + (A_S/A_A)*(m_Yields.at('A')[Bin] - (A_S/A_A)*m_Yields.at('D')[Bin]) + (A_S/A_B)*(m_Yields.at('B')[Bin] - (A_S/A_B)*m_Yields.at('D')[Bin]) + (A_S/A_C)*(m_Yields.at('C')[Bin] - (A_S/A_C)*m_Yields.at('D')[Bin]);
-    return m_Yields.at('S')[Bin] - Background - m_PeakingBackground.at('S')[Bin];
+    double Background = (A_S/A_D)*m_Yields.at('D')[Bin] + (A_S/A_A)*(m_Yields.at('A')[Bin] - (A_A/A_D)*m_Yields.at('D')[Bin]) + (A_S/A_B)*(m_Yields.at('B')[Bin] - (A_B/A_D)*m_Yields.at('D')[Bin]) + (A_S/A_C)*(m_Yields.at('C')[Bin] - (A_C/A_D)*m_Yields.at('D')[Bin]);
+    double BackgroundError2 = TMath::Power(2*A_S/A_D, 2)*m_Yields.at('D')[Bin] + TMath::Power(A_S/A_A, 2)*m_Yields.at('A')[Bin] + TMath::Power(A_S/A_B, 2)*m_Yields.at('C')[Bin] + TMath::Power(A_S/A_C, 2)*m_Yields.at('C')[Bin];
+    double PeakingBackgroundError2 = m_PeakingBackground.at('S')[Bin]/LuminosityScale;
+    double YieldError = m_Yields.at('S')[Bin];
+    double BackgroundSubtractedYield = m_Yields.at('S')[Bin] - Background - m_PeakingBackground.at('S')[Bin];
+    double Error = TMath::Sqrt(YieldError + BackgroundError2 + PeakingBackgroundError2);
+    return std::pair<double, double>{BackgroundSubtractedYield, Error};
   } else {
     double alpha = KpiSettings::Get().GetDouble("alpha");
     double beta = KpiSettings::Get().GetDouble("beta");
     double gamma = KpiSettings::Get().GetDouble("gamma");
     double delta = KpiSettings::Get().GetDouble("delta");
-    return ((m_Yields.at('S')[Bin] - m_PeakingBackground.at('S')[Bin]) - delta*(m_Yields.at('L')[Bin] - m_PeakingBackground.at('L')[Bin]) - gamma*(m_Yields.at('H')[Bin] - m_PeakingBackground.at('H')[Bin]))/(1 - delta*alpha - gamma*beta);
+    double BackgroundSubtractedYield = ((m_Yields.at('S')[Bin] - m_PeakingBackground.at('S')[Bin]) - delta*(m_Yields.at('L')[Bin] - m_PeakingBackground.at('L')[Bin]) - gamma*(m_Yields.at('H')[Bin] - m_PeakingBackground.at('H')[Bin]))/(1 - delta*alpha - gamma*beta);
+    double Error2 = m_Yields.at('S')[Bin] + m_PeakingBackground.at('S')[Bin]/LuminosityScale + delta*delta*(m_Yields.at('L')[Bin] + m_PeakingBackground.at('L')[Bin]/LuminosityScale) + gamma*gamma*(m_Yields.at('H')[Bin] + m_PeakingBackground.at('H')[Bin]/LuminosityScale);
+    double Error = TMath::Sqrt(Error2)/(1 - delta*alpha - gamma*beta);
+    return std::pair<double, double>{BackgroundSubtractedYield, Error};
   } 
 }
 
@@ -110,34 +119,23 @@ void AnalyseYield::CalculateDoubleTagYields(const TMatrixT<double> &BinMigration
 
 void AnalyseYield::SaveFinalYields(const TMatrixT<double> &BinMigrationMatrix, const std::string &Filename) const {
   TMatrixT<double> RawDoubleTagYield(2*m_BinningScheme.GetNumberBins(), 1);
-  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+  TMatrixT<double> RawDoubleTagYieldError(2*m_BinningScheme.GetNumberBins(), 1);
+  for(int i : m_Yields.at('S').GetBinNumbers()) {
     if(m_SubtractBackground) {
-      RawDoubleTagYield[ArrayIndex(i)][0] = GetBackgroundSubtractedYield(i);
+      std::tie(RawDoubleTagYield[ArrayIndex(i)][0], RawDoubleTagYieldError[ArrayIndex(i)][0]) = GetBackgroundSubtractedYield(i);
     } else {
       RawDoubleTagYield[ArrayIndex(i)][0] = m_Yields.at('S')[i];
-    }
-  }
-  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
-    if(m_SubtractBackground) {
-      RawDoubleTagYield[ArrayIndex(-i)][0] = GetBackgroundSubtractedYield(-i);
-    } else {
-      RawDoubleTagYield[ArrayIndex(-i)][0] = m_Yields.at('S')[-i];
+      RawDoubleTagYieldError[ArrayIndex(i)][0] = TMath::Sqrt(m_Yields.at('S')[i]);
     }
   }
   TMatrixT<double> MigrationCorrectedYield = BinMigrationMatrix*RawDoubleTagYield;
   std::ofstream ResultsFile(Filename);
-  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
-    ResultsFile << MigrationCorrectedYield[ArrayIndex(i)][0] << " ";
-  }
-  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
-    ResultsFile << MigrationCorrectedYield[ArrayIndex(-i)][0] << " ";
+  for(int i : m_Yields.at('S').GetBinNumbers()) {
+    ResultsFile << MigrationCorrectedYield[ArrayIndex(i)][0] << " " << RawDoubleTagYieldError[ArrayIndex(i)][0] << " ";
   }
   ResultsFile << "\n";
-  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+  for(int i : m_Yields.at('S').GetBinNumbers()) {
     ResultsFile << RawDoubleTagYield[ArrayIndex(i)][0] << " ";
-  }
-  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
-    ResultsFile << RawDoubleTagYield[ArrayIndex(-i)][0] << " ";
   }
   ResultsFile << "\n" << m_EventsOutsideMBCSpace << " " << m_EventsOutsidePhaseSpace << "\n";
   std::vector<char> Regions;
@@ -147,11 +145,8 @@ void AnalyseYield::SaveFinalYields(const TMatrixT<double> &BinMigrationMatrix, c
     Regions = std::vector<char>{'S', 'L', 'H'};
   }
   for(auto R : Regions) {
-    for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+    for(int i : m_Yields.at('S').GetBinNumbers()) {
       ResultsFile << m_Yields.at(R)[i] << " ";
-    }
-    for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
-      ResultsFile << m_Yields.at(R)[-i] << " ";
     }
     ResultsFile << "\n";
   }

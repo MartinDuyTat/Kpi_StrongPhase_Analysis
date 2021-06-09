@@ -37,6 +37,10 @@ class AnalyseFinalYields: public Analyse {
      * Vector with data yields
      */
     BinVector<double> m_DataYields;
+    /**
+     * Vector with data yield errors
+     */
+    BinVector<double> m_DataYieldErrors;
 };
 
 #endif

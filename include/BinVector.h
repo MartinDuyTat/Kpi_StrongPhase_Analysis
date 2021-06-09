@@ -66,6 +66,19 @@ class BinVector {
     typename std::vector<T>::iterator end() {
       return m_BinVector.end();
     }
+    /**
+     * Get a list of bin numbers, in the order 1, 2, 3, ..., -1, -2, -3, ...
+     */
+    std::vector<int> GetBinNumbers() const {
+      std::vector<int> BinNumbers;
+      for(int i = 1; i <= m_Size; i++) {
+	BinNumbers.push_back(i);
+      }
+      for(int i = 1; i <= m_Size; i++) {
+	BinNumbers.push_back(-i);
+      }
+      return BinNumbers;
+    }
   private:
     /**
      * Flag that is true if negative bins are enabled

@@ -15,11 +15,8 @@ void AnalyseTruthYield::CalculateTruthYield(const std::string &Filename) {
     m_GeneratorYields[BinNumber]++;
   }
   std::ofstream Outfile(Filename);
-  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
+  for(int i : m_GeneratorYields.GetBinNumbers()) {
     Outfile << m_GeneratorYields[i] << " ";
-  }
-  for(int i = 1; i <= m_BinningScheme.GetNumberBins(); i++) {
-    Outfile << m_GeneratorYields[-i] << " ";
   }
   Outfile << "\n";
   Outfile.close();
