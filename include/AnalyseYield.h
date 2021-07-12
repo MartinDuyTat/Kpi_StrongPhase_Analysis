@@ -12,6 +12,7 @@
 #include<string>
 #include"BinVector.h"
 #include"Analyse.h"
+#include"KSKKBackground.h"
 #include"TMatrixT.h"
 
 class AnalyseYield: public Analyse {
@@ -69,6 +70,10 @@ class AnalyseYield: public Analyse {
      * Events outside of phase space
      */
     int m_EventsOutsidePhaseSpace;
+    /**
+     * For KLKK tag modes, this object contains the peaking backgrounds of KSKK
+     */
+    KSKKBackground m_KSKKBackground;
 };
 
 #endif

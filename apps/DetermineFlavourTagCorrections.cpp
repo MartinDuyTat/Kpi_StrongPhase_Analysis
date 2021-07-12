@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
   }
   KpiSettings::Get().Initialize(std::string(argv[1]));
   std::cout << "Calculating flavour tag corrections...\n";
-  FlavourCorrection FlavourCorrections(2, KpiSettings::Get().GetString("Mode"), KpiSettings::Get().GetString("StrongPhasesFromModelFile"), KpiSettings::Get().GetString("HadronicParametersFile"));
+  FlavourCorrection FlavourCorrections(KpiSettings::Get().GetInt("Bins"), KpiSettings::Get().GetString("Mode"), KpiSettings::Get().GetString("StrongPhasesFromModelFile"), KpiSettings::Get().GetString("HadronicParametersFile"));
   FlavourCorrections.SaveCorrections(KpiSettings::Get().GetString("FlavourTagCorrectionsFile"));
   std::cout << "Flavour tag corrections ready!\n";
   return 0;

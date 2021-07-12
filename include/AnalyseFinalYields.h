@@ -4,7 +4,7 @@
 */
 
 #ifndef ANALYSEFINALYIELDS
-#define NALAYSEFINALYIELDS
+#define ANALYSEFINALYIELDS
 
 #include<string>
 #include"Analyse.h"
@@ -17,8 +17,9 @@ class AnalyseFinalYields: public Analyse {
      * @param GeneratorYieldsFilename Filename of text file with generator yields
      * @param SignalMCYieldsFilename Filename of text file with signal MC yields
      * @param DataYieldsFilename Filename of text file with data yields
+     * @param FlavourTagCorrectionFilename Filename of text file with flavour tag corrections
      */
-    AnalyseFinalYields(const std::string &GeneratorYieldsFilename, const std::string &SignalMCYieldsFilename, const std::string &DataYieldsFilename);
+    AnalyseFinalYields(const std::string &GeneratorYieldsFilename, const std::string &SignalMCYieldsFilename, const std::string &DataYieldsFilename, const std::string &FlavourTagCorrectionFilename = "");
     /**
      * Function that calculates the efficiency corrected, normalized yields and saves them to a file
      * @param Filename Filename of text file with final yields
@@ -41,6 +42,14 @@ class AnalyseFinalYields: public Analyse {
      * Vector with data yield errors
      */
     BinVector<double> m_DataYieldErrors;
+    /**
+     * Flavour tag corrections
+     */
+    BinVector<double> m_FlavourTagCorrections;
+    /**
+     * Flavour tag correction errors
+     */
+    BinVector<double> m_FlavourTagCorrectionErrors;
 };
 
 #endif

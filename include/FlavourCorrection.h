@@ -60,6 +60,10 @@ class FlavourCorrection {
      * The hadronic rD, deltaD and R parameter errors
      */
     std::map<std::string, double> m_HadronicErrors;
+    /**
+     * The hadronic rD, deltaD and R parameter correlations
+     */
+    std::map<std::string, double> m_HadronicCorrelations;
 };
 
 #endif

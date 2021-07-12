@@ -77,8 +77,16 @@ std::pair<double, double> AnalyseYield::GetBackgroundSubtractedYield(int Bin) co
     double beta = KpiSettings::Get().GetDouble("beta");
     double gamma = KpiSettings::Get().GetDouble("gamma");
     double delta = KpiSettings::Get().GetDouble("delta");
-    double BackgroundSubtractedYield = ((m_Yields.at('S')[Bin] - m_PeakingBackground.at('S')[Bin]) - delta*(m_Yields.at('L')[Bin] - m_PeakingBackground.at('L')[Bin]) - gamma*(m_Yields.at('H')[Bin] - m_PeakingBackground.at('H')[Bin]))/(1 - delta*alpha - gamma*beta);
-    double Error2 = m_Yields.at('S')[Bin] + m_PeakingBackground.at('S')[Bin]/LuminosityScale + delta*delta*(m_Yields.at('L')[Bin] + m_PeakingBackground.at('L')[Bin]/LuminosityScale) + gamma*gamma*(m_Yields.at('H')[Bin] + m_PeakingBackground.at('H')[Bin]/LuminosityScale);
+    double KSKKBackgroundYield, KSKKBackgroundYieldError;
+    if(m_Tree->GetSignalMode() == "KLKK") {
+      KSKKBackgroundYield = m_KSKKBackground.GetBinYield(Bin);
+      KSKKBackgroundYieldError = m_KSKKBackground.GetBinYieldError(Bin);
+    } else {
+      KSKKBackgroundYield = 0.0;
+      KSKKBackgroundYieldError = 0.0;
+    }
+    double BackgroundSubtractedYield = ((m_Yields.at('S')[Bin] - KSKKBackgroundYield - m_PeakingBackground.at('S')[Bin]) - delta*(m_Yields.at('L')[Bin] - m_PeakingBackground.at('L')[Bin]) - gamma*(m_Yields.at('H')[Bin] - m_PeakingBackground.at('H')[Bin]))/(1 - delta*alpha - gamma*beta);
+    double Error2 = m_Yields.at('S')[Bin] + TMath::Power(KSKKBackgroundYieldError, 2) + m_PeakingBackground.at('S')[Bin]/LuminosityScale + delta*delta*(m_Yields.at('L')[Bin] + m_PeakingBackground.at('L')[Bin]/LuminosityScale) + gamma*gamma*(m_Yields.at('H')[Bin] + m_PeakingBackground.at('H')[Bin]/LuminosityScale);
     double Error = TMath::Sqrt(Error2)/(1 - delta*alpha - gamma*beta);
     return std::pair<double, double>{BackgroundSubtractedYield, Error};
   } 

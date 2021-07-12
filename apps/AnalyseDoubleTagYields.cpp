@@ -31,7 +31,11 @@ int main(int argc, char *argv[]) {
   AnalyseYield Analysis(&DataTree, true, KpiSettings::Get().GetString("PeakingBackgroundsFile"));
   Analysis.CalculateDoubleTagYields(AnalysisBinMigration.GetBinMigrationMatrix(), KpiSettings::Get().GetString("DataResultsFile"));
   Analysis.SaveDalitzDistributions(KpiSettings::Get().GetString("DalitzPlotFilename"));
-  AnalyseFinalYields AnalysisFinalYields(KpiSettings::Get().GetString("TruthResultsFile"), KpiSettings::Get().GetString("SignalMCResultsFile"), KpiSettings::Get().GetString("DataResultsFile"));
+  std::string FlavourTagCorrectionsFile = KpiSettings::Get().GetString("FlavourTagCorrectionsFile");
+  if(FlavourTagCorrectionsFile == "None") {
+    FlavourTagCorrectionsFile = "";
+  }
+  AnalyseFinalYields AnalysisFinalYields(KpiSettings::Get().GetString("TruthResultsFile"), KpiSettings::Get().GetString("SignalMCResultsFile"), KpiSettings::Get().GetString("DataResultsFile"), FlavourTagCorrectionsFile);
   AnalysisFinalYields.CalculateFinalYields(KpiSettings::Get().GetString("FinalYieldsFile"));
   return 0;
 }

@@ -1,11 +1,12 @@
 // Martin Duy Tat 19th May 2021
 
 #include<fstream>
+#include<sstream>
 #include<algorithm>
 #include"AnalyseFinalYields.h"
 #include"BinVector.h"
 
-AnalyseFinalYields::AnalyseFinalYields(const std::string &GeneratorYieldsFilename, const std::string &SignalMCYieldsFilename, const std::string &DataYieldsFilename): Analyse(nullptr), m_GeneratorYields(BinVector<double>(true, m_BinningScheme.GetNumberBins())), m_SignalMCYields(BinVector<double>(true, m_BinningScheme.GetNumberBins())), m_DataYields(BinVector<double>(true, m_BinningScheme.GetNumberBins())), m_DataYieldErrors(BinVector<double>(true, m_BinningScheme.GetNumberBins())) {
+AnalyseFinalYields::AnalyseFinalYields(const std::string &GeneratorYieldsFilename, const std::string &SignalMCYieldsFilename, const std::string &DataYieldsFilename, const std::string &FlavourTagCorrectionFilename): Analyse(nullptr), m_GeneratorYields(BinVector<double>(true, m_BinningScheme.GetNumberBins())), m_SignalMCYields(BinVector<double>(true, m_BinningScheme.GetNumberBins())), m_DataYields(BinVector<double>(true, m_BinningScheme.GetNumberBins())), m_DataYieldErrors(BinVector<double>(true, m_BinningScheme.GetNumberBins())), m_FlavourTagCorrections(BinVector<double>(true, m_BinningScheme.GetNumberBins())), m_FlavourTagCorrectionErrors(BinVector<double>(true, m_BinningScheme.GetNumberBins())) {
   std::ifstream GeneratorFile(GeneratorYieldsFilename);
   std::ifstream SignalMCFile(SignalMCYieldsFilename);
   std::ifstream DataFile(DataYieldsFilename);
@@ -14,6 +15,24 @@ AnalyseFinalYields::AnalyseFinalYields(const std::string &GeneratorYieldsFilenam
     GeneratorFile >> m_GeneratorYields[i];
     SignalMCFile >> m_SignalMCYields[i] >> dummy;
     DataFile >> m_DataYields[i] >> m_DataYieldErrors[i];
+  }
+  if(FlavourTagCorrectionFilename != "") {
+    std::ifstream FlavourCorrectionFile(FlavourTagCorrectionFilename);
+    std::string line;
+    while(std::getline(FlavourCorrectionFile, line)) {
+      int Bin;
+      double Correction, Error;
+      std::stringstream ss(line);
+      ss >> Bin >> Correction >> Error;
+      m_FlavourTagCorrections[Bin] = Correction;
+      m_FlavourTagCorrectionErrors[Bin] = Error;
+    }
+    FlavourCorrectionFile.close();
+  } else {
+    for(auto i : m_FlavourTagCorrections.GetBinNumbers()) {
+      m_FlavourTagCorrections[i] = 1.0;
+      m_FlavourTagCorrectionErrors[i] = 0.0;
+    }
   }
 }
 
@@ -25,8 +44,8 @@ void AnalyseFinalYields::CalculateFinalYields(const std::string &Filename) const
   for(int i : FinalYields.GetBinNumbers()) {
     double p = m_SignalMCYields[i]/m_GeneratorYields[i];
     double pError = TMath::Sqrt(p*(1 - p)/m_GeneratorYields[i]);
-    FinalYields[i] = m_DataYields[i]/p;
-    FinalYieldErrors[i] = TMath::Sqrt(TMath::Power(m_DataYieldErrors[i]/m_DataYields[i], 2) + TMath::Power(pError/p, 2))*FinalYields[i];
+    FinalYields[i] = m_DataYields[i]*m_FlavourTagCorrections[i]/p;
+    FinalYieldErrors[i] = TMath::Sqrt(TMath::Power(m_DataYieldErrors[i]/m_DataYields[i], 2) + TMath::Power(pError/p, 2) + TMath::Power(m_FlavourTagCorrectionErrors[i]/m_FlavourTagCorrections[i], 2))*FinalYields[i];
     Sum += FinalYields[i];
     Outfile << FinalYields[i] << " " << FinalYieldErrors[i] << " ";
   }
