@@ -39,9 +39,13 @@ class AnalyseFinalYields: public Analyse {
      */
     BinVector<double> m_DataYields;
     /**
-     * Vector with data yield errors
+     * Vector with data yield statistical errors
      */
-    BinVector<double> m_DataYieldErrors;
+    BinVector<double> m_DataYieldStatErrors;
+    /**
+     * Vector with data yield systematic errors
+     */
+    BinVector<double> m_DataYieldSystErrors;
     /**
      * Flavour tag corrections
      */
@@ -50,6 +54,14 @@ class AnalyseFinalYields: public Analyse {
      * Flavour tag correction errors
      */
     BinVector<double> m_FlavourTagCorrectionErrors;
+    /**
+     * Since the normalization constant depends on the individual yields, the error propagation is more complex
+     * @param Bin number to calculate error for
+     * @param Sum Normalization sum of all yields
+     * @param NormalizedYield The yield after normalization
+     * @param Error The yield error before normalization
+     */
+    double CalculateNormalizationError(int Bin, double Sum, const BinVector<double> &NormalizedYield, const BinVector<double> &Error) const;
 };
 
 #endif

@@ -26,9 +26,9 @@ class AnalyseYield: public Analyse {
     AnalyseYield(TreeWrapper *Tree, bool SubtractBackground = true, const std::string &PeakingBackgroundFile = std::string(""));
     /**
      * Get the background subtracted yield
-     * @return Returns a pair, the first number being the value and the second being the error
+     * @return Returns a pair, the first number being the value and the second being a pair with statistical and systematics errors
      */
-    std::pair<double, double> GetBackgroundSubtractedYield(int Bin) const;
+    std::pair<double, std::pair<double, double>> GetBackgroundSubtractedYield(int Bin) const;
     /**
      * Run the analysis and save the double tag yields
      * @param BinMigrationMatrix Matrix that accounts for bin migration

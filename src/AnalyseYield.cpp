@@ -56,7 +56,7 @@ AnalyseYield::AnalyseYield(TreeWrapper *Tree, bool SubtractBackground, const std
   }
 }
 
-std::pair<double, double> AnalyseYield::GetBackgroundSubtractedYield(int Bin) const {
+std::pair<double, std::pair<double, double>> AnalyseYield::GetBackgroundSubtractedYield(int Bin) const {
   double LuminosityScale = KpiSettings::Get().GetDouble("LuminosityScale");
   if(m_Tree->GetSignalMode() == "KSKK" && m_Tree->GetTagMode() != "KeNu") {
     // Area in beam constrained 2D plane
@@ -68,10 +68,11 @@ std::pair<double, double> AnalyseYield::GetBackgroundSubtractedYield(int Bin) co
     double Background = (A_S/A_D)*m_Yields.at('D')[Bin] + (A_S/A_A)*(m_Yields.at('A')[Bin] - (A_A/A_D)*m_Yields.at('D')[Bin]) + (A_S/A_B)*(m_Yields.at('B')[Bin] - (A_B/A_D)*m_Yields.at('D')[Bin]) + (A_S/A_C)*(m_Yields.at('C')[Bin] - (A_C/A_D)*m_Yields.at('D')[Bin]);
     double BackgroundError2 = TMath::Power(2*A_S/A_D, 2)*m_Yields.at('D')[Bin] + TMath::Power(A_S/A_A, 2)*m_Yields.at('A')[Bin] + TMath::Power(A_S/A_B, 2)*m_Yields.at('C')[Bin] + TMath::Power(A_S/A_C, 2)*m_Yields.at('C')[Bin];
     double PeakingBackgroundError2 = m_PeakingBackground.at('S')[Bin]/LuminosityScale;
-    double YieldError = m_Yields.at('S')[Bin];
+    double YieldError2 = m_Yields.at('S')[Bin];
     double BackgroundSubtractedYield = m_Yields.at('S')[Bin] - Background - m_PeakingBackground.at('S')[Bin];
-    double Error = TMath::Sqrt(YieldError + BackgroundError2 + PeakingBackgroundError2);
-    return std::pair<double, double>{BackgroundSubtractedYield, Error};
+    double StatError = TMath::Sqrt(YieldError2 + BackgroundError2);
+    double SystError = TMath::Sqrt(PeakingBackgroundError2);
+    return std::pair<double, std::pair<double, double>>{BackgroundSubtractedYield, std::pair<double, double>{StatError, SystError}};
   } else {
     double alpha = KpiSettings::Get().GetDouble("alpha");
     double beta = KpiSettings::Get().GetDouble("beta");
@@ -86,9 +87,11 @@ std::pair<double, double> AnalyseYield::GetBackgroundSubtractedYield(int Bin) co
       KSKKBackgroundYieldError = 0.0;
     }
     double BackgroundSubtractedYield = ((m_Yields.at('S')[Bin] - KSKKBackgroundYield - m_PeakingBackground.at('S')[Bin]) - delta*(m_Yields.at('L')[Bin] - m_PeakingBackground.at('L')[Bin]) - gamma*(m_Yields.at('H')[Bin] - m_PeakingBackground.at('H')[Bin]))/(1 - delta*alpha - gamma*beta);
-    double Error2 = m_Yields.at('S')[Bin] + TMath::Power(KSKKBackgroundYieldError, 2) + m_PeakingBackground.at('S')[Bin]/LuminosityScale + delta*delta*(m_Yields.at('L')[Bin] + m_PeakingBackground.at('L')[Bin]/LuminosityScale) + gamma*gamma*(m_Yields.at('H')[Bin] + m_PeakingBackground.at('H')[Bin]/LuminosityScale);
-    double Error = TMath::Sqrt(Error2)/(1 - delta*alpha - gamma*beta);
-    return std::pair<double, double>{BackgroundSubtractedYield, Error};
+    double StatError2 = m_Yields.at('S')[Bin] + delta*delta*(m_Yields.at('L')[Bin]) + gamma*gamma*(m_Yields.at('H')[Bin]);
+    double SystError2 = TMath::Power(KSKKBackgroundYieldError, 2) + m_PeakingBackground.at('S')[Bin]/LuminosityScale + delta*delta*m_PeakingBackground.at('L')[Bin]/LuminosityScale + gamma*gamma*m_PeakingBackground.at('H')[Bin]/LuminosityScale;
+    double StatError = TMath::Sqrt(StatError2)/(1 - delta*alpha - gamma*beta);
+    double SystError = TMath::Sqrt(SystError2)/(1 - delta*alpha - gamma*beta);
+    return std::pair<double, std::pair<double, double>>{BackgroundSubtractedYield, std::pair<double, double>{StatError, SystError}};
   } 
 }
 
@@ -127,19 +130,21 @@ void AnalyseYield::CalculateDoubleTagYields(const TMatrixT<double> &BinMigration
 
 void AnalyseYield::SaveFinalYields(const TMatrixT<double> &BinMigrationMatrix, const std::string &Filename) const {
   TMatrixT<double> RawDoubleTagYield(2*m_BinningScheme.GetNumberBins(), 1);
-  TMatrixT<double> RawDoubleTagYieldError(2*m_BinningScheme.GetNumberBins(), 1);
+  TMatrixT<double> RawDoubleTagYieldStatError(2*m_BinningScheme.GetNumberBins(), 1);
+  TMatrixT<double> RawDoubleTagYieldSystError(2*m_BinningScheme.GetNumberBins(), 1);
   for(int i : m_Yields.at('S').GetBinNumbers()) {
     if(m_SubtractBackground) {
-      std::tie(RawDoubleTagYield[ArrayIndex(i)][0], RawDoubleTagYieldError[ArrayIndex(i)][0]) = GetBackgroundSubtractedYield(i);
+      std::forward_as_tuple(RawDoubleTagYield[ArrayIndex(i)][0], std::tie(RawDoubleTagYieldStatError[ArrayIndex(i)][0], RawDoubleTagYieldSystError[ArrayIndex(i)][0])) = GetBackgroundSubtractedYield(i);
     } else {
       RawDoubleTagYield[ArrayIndex(i)][0] = m_Yields.at('S')[i];
-      RawDoubleTagYieldError[ArrayIndex(i)][0] = TMath::Sqrt(m_Yields.at('S')[i]);
+      RawDoubleTagYieldStatError[ArrayIndex(i)][0] = TMath::Sqrt(m_Yields.at('S')[i]);
+      RawDoubleTagYieldSystError[ArrayIndex(i)][0] = 0.0;
     }
   }
   TMatrixT<double> MigrationCorrectedYield = BinMigrationMatrix*RawDoubleTagYield;
   std::ofstream ResultsFile(Filename);
   for(int i : m_Yields.at('S').GetBinNumbers()) {
-    ResultsFile << MigrationCorrectedYield[ArrayIndex(i)][0] << " " << RawDoubleTagYieldError[ArrayIndex(i)][0] << " ";
+    ResultsFile << MigrationCorrectedYield[ArrayIndex(i)][0] << " " << RawDoubleTagYieldStatError[ArrayIndex(i)][0] << " " << RawDoubleTagYieldSystError[ArrayIndex(i)][0] << " ";
   }
   ResultsFile << "\n";
   for(int i : m_Yields.at('S').GetBinNumbers()) {
