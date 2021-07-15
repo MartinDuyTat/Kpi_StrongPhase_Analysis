@@ -29,13 +29,9 @@ class YieldCombiner {
      */
     BinVector<double> m_Yield;
     /**
-     * Binned yield statistical error
+     * Binned yield total error, after combining statistical and systematic errors
      */
-    BinVector<double> m_YieldStatError;
-    /**
-     * Binned yield systematic error
-     */
-    BinVector<double> m_YieldSystError;
+    BinVector<double> m_YieldError;
     /**
      * Function that normalizes the yields, including propagating the uncertainties
      */

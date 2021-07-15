@@ -9,15 +9,14 @@
 #include"BinVector.h"
 #include"TMath.h"
 
-YieldCombiner::YieldCombiner(int Bins, const std::vector<std::string> &Files): m_Yield(BinVector<double>(true, Bins)), m_YieldStatError(BinVector<double>(true, Bins)), m_YieldSystError(BinVector<double>(true, Bins)) {
+YieldCombiner::YieldCombiner(int Bins, const std::vector<std::string> &Files): m_Yield(BinVector<double>(true, Bins)), m_YieldError(BinVector<double>(true, Bins)) {
   for(auto Filename : Files) {
     std::ifstream Infile(Filename);
     for(auto Bin : m_Yield.GetBinNumbers()) {
-      double Yield, YieldStatError, YieldSystError;
-      Infile >> Yield >> YieldStatError >> YieldSystError;
+      double Yield, YieldStatError, YieldSystError, FlavourCorrectionError;
+      Infile >> Yield >> YieldStatError >> YieldSystError >> FlavourCorrectionError;
       m_Yield[Bin] += Yield;
-      m_YieldStatError[Bin] = TMath::Sqrt(TMath::Power(m_YieldStatError[Bin], 2) + TMath::Power(YieldStatError, 2));
-      m_YieldSystError[Bin] = TMath::Sqrt(TMath::Power(m_YieldSystError[Bin], 2) + TMath::Power(YieldSystError, 2));
+      m_YieldError[Bin] = TMath::Sqrt(TMath::Power(m_YieldError[Bin], 2) + TMath::Power(YieldStatError, 2) + TMath::Power(YieldSystError, 2) + TMath::Power(FlavourCorrectionError, 2));
     }
     Infile.close();
   }
@@ -27,7 +26,7 @@ YieldCombiner::YieldCombiner(int Bins, const std::vector<std::string> &Files): m
 void YieldCombiner::SaveYields(const std::string &Filename) const {
   std::ofstream Outfile(Filename);
   for(auto Bin : m_Yield.GetBinNumbers()) {
-    Outfile << Bin << " " << m_Yield[Bin] << " " << m_YieldStatError[Bin] << " " << m_YieldSystError[Bin] << "\n";
+    Outfile << Bin << " " << m_Yield[Bin] << " " << m_YieldError[Bin] << "\n";
   }
   Outfile.close();
 }
@@ -35,11 +34,9 @@ void YieldCombiner::SaveYields(const std::string &Filename) const {
 void YieldCombiner::NormalizeYields() {
   double Sum = std::accumulate(m_Yield.begin(), m_Yield.end(), 0.0);
   std::transform(m_Yield.begin(), m_Yield.end(), m_Yield.begin(), [&Sum] (double a) { return a/Sum; });
-  BinVector<double> YieldNormalizedStatError = m_YieldStatError;
-  BinVector<double> YieldNormalizedSystError = m_YieldSystError;
+  BinVector<double> YieldNormalizedError = m_YieldError;
   for(auto Bin : m_Yield.GetBinNumbers()) {
-    m_YieldStatError[Bin] = CalculateNormalizationError(Bin, Sum, m_Yield, YieldNormalizedStatError);
-    m_YieldSystError[Bin] = CalculateNormalizationError(Bin, Sum, m_Yield, YieldNormalizedSystError);
+    m_YieldError[Bin] = CalculateNormalizationError(Bin, Sum, m_Yield, YieldNormalizedError);
   }
 }
 

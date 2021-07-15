@@ -40,6 +40,7 @@ void AnalyseFinalYields::CalculateFinalYields(const std::string &Filename) const
   BinVector<double> FinalYields(true, m_BinningScheme.GetNumberBins());
   BinVector<double> FinalYieldStatErrors(true, m_BinningScheme.GetNumberBins());
   BinVector<double> FinalYieldSystErrors(true, m_BinningScheme.GetNumberBins());
+  BinVector<double> FlavourTagCorrectionErrors(true, m_BinningScheme.GetNumberBins());
   double Sum = 0.0;
   std::ofstream Outfile(Filename);
   for(int i : FinalYields.GetBinNumbers()) {
@@ -47,14 +48,15 @@ void AnalyseFinalYields::CalculateFinalYields(const std::string &Filename) const
     double pError = TMath::Sqrt(p*(1 - p)/m_GeneratorYields[i]);
     FinalYields[i] = m_DataYields[i]*m_FlavourTagCorrections[i]/p;
     FinalYieldStatErrors[i] = (m_DataYieldStatErrors[i]/m_DataYields[i])*FinalYields[i];
-    FinalYieldSystErrors[i] = TMath::Sqrt(TMath::Power(m_DataYieldSystErrors[i]/m_DataYields[i], 2) + TMath::Power(pError/p, 2) + TMath::Power(m_FlavourTagCorrectionErrors[i]/m_FlavourTagCorrections[i], 2))*FinalYields[i];
+    FinalYieldSystErrors[i] = TMath::Sqrt(TMath::Power(m_DataYieldSystErrors[i]/m_DataYields[i], 2) + TMath::Power(pError/p, 2))*FinalYields[i];
+    FlavourTagCorrectionErrors[i] = (m_FlavourTagCorrectionErrors[i]/m_FlavourTagCorrections[i])*FinalYields[i];
     Sum += FinalYields[i];
-    Outfile << FinalYields[i] << " " << FinalYieldStatErrors[i] << " " << FinalYieldSystErrors[i] << " ";
+    Outfile << FinalYields[i] << " " << FinalYieldStatErrors[i] << " " << FinalYieldSystErrors[i] << " " << FlavourTagCorrectionErrors[i] << " ";
   }
   Outfile << "\n";
   std::transform(FinalYields.begin(), FinalYields.end(), FinalYields.begin(), [&Sum](double value){return value/Sum;});
   for(int i : FinalYields.GetBinNumbers()) {
-    Outfile << FinalYields[i] << " " << CalculateNormalizationError(i, Sum, FinalYields, FinalYieldStatErrors) << " " << CalculateNormalizationError(i, Sum, FinalYields, FinalYieldSystErrors) << " ";
+    Outfile << FinalYields[i] << " " << CalculateNormalizationError(i, Sum, FinalYields, FinalYieldStatErrors) << " " << CalculateNormalizationError(i, Sum, FinalYields, FinalYieldSystErrors) << " " << CalculateNormalizationError(i, Sum, FinalYields, FlavourTagCorrectionErrors) << " ";
   }
   Outfile << "\n";
   Outfile.close();
