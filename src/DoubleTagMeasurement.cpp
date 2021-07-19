@@ -12,9 +12,9 @@ DoubleTagMeasurement::DoubleTagMeasurement(int NBins, const std::string &K0Mode,
   m_DTYields.PrintYields();
 }
 
-double DoubleTagMeasurement::GetChi2(double rDcosDelta, double rDsinDelta) {
+double DoubleTagMeasurement::GetChi2(double Normalization, double rDcosDelta, double rDsinDelta) {
   BinVector<double> YieldPredictions, YieldErrorPredictions;
-  m_HParameters.CalculateNormalizedYields(rDcosDelta, rDsinDelta, YieldPredictions, YieldErrorPredictions);
+  m_HParameters.CalculateNormalizedYields(Normalization, rDcosDelta, rDsinDelta, YieldPredictions, YieldErrorPredictions);
   double Chi2 = 0.0;
   for(int Bin = -m_NBins; Bin <= m_NBins; Bin++ ) {
     if(Bin == 0) {

@@ -76,7 +76,7 @@ double HadronicParameters::CalculateYieldError(int Bin, double rDcosDelta, doubl
   return TMath::Sqrt(TMath::Power(KiDerivative*m_KiError[Bin], 2) + TMath::Power(KbariDerivative*m_KiError[-Bin], 2));
 }
 
-void HadronicParameters::CalculateNormalizedYields(double rDcosDelta, double rDsinDelta, BinVector<double> &Yield, BinVector<double> &YieldError) const {
+void HadronicParameters::CalculateNormalizedYields(double Normalization, double rDcosDelta, double rDsinDelta, BinVector<double> &Yield, BinVector<double> &YieldError) const {
   Yield = BinVector<double>(true, m_NBins);
   YieldError = BinVector<double>(true, m_NBins);
   for(int i = 1; i <= m_NBins; i++) {
@@ -85,9 +85,9 @@ void HadronicParameters::CalculateNormalizedYields(double rDcosDelta, double rDs
     YieldError[i] = CalculateYieldError(i, rDcosDelta, rDsinDelta);
     YieldError[-i] = CalculateYieldError(-i, rDcosDelta, rDsinDelta);
   }
-  double Normalization = NormalizeYield(rDcosDelta, rDsinDelta);
-  std::transform(Yield.begin(), Yield.end(), Yield.begin(), [&Normalization](auto &c){return Normalization*c;});
-  std::transform(YieldError.begin(), YieldError.end(), YieldError.begin(), [&Normalization](auto &c){return Normalization*c;});
+  double NormalizationConstant = NormalizeYield(rDcosDelta, rDsinDelta);
+  std::transform(Yield.begin(), Yield.end(), Yield.begin(), [&NormalizationConstant, Normalization](auto &c){return Normalization*NormalizationConstant*c;});
+  std::transform(YieldError.begin(), YieldError.end(), YieldError.begin(), [&NormalizationConstant, &Normalization](auto &c){return Normalization*NormalizationConstant*c;});
 }
 
 void HadronicParameters::PrintHadronicParameters() const {

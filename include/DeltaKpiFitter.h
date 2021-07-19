@@ -14,8 +14,9 @@ class DeltaKpiFitter {
     /**
      * Constructor that sets up the measurements that are fitted
      * @param Filename Filename of text file with paths to different measurements
+     * @param FixNormalization Flag that fixes the normalization if it's true
      */
-    DeltaKpiFitter(const std::string &Filename);
+    DeltaKpiFitter(const std::string &Filename, bool FixNormalization = true);
     /**
      * Run the fit and save measurements
      * @param Filename Filename of text file to save results to

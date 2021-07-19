@@ -12,9 +12,10 @@
 class Chi2DoubleTagYield {
   public:
     /**
-     * Trivial constructor
+     * Constructor that fixed the normalization by default
+     * @param FixNormalization True if normalization is fixed to 1
      */
-    Chi2DoubleTagYield();
+    Chi2DoubleTagYield(bool FixNormalization);
     /**
      * Function for adding a measurement
      * @param Measurement A DoubleTagMeasurement object to be added
@@ -53,6 +54,10 @@ class Chi2DoubleTagYield {
      */
     int GetDegreesOfFreedom() const;
   private:
+    /**
+     * Flag that is true when the normalization is fixed to 1
+     */
+    bool m_FixNormalization;
     /**
      * Vector of measurements
      */

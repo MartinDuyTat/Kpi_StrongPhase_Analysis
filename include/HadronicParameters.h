@@ -64,8 +64,9 @@ class HadronicParameters {
      * Function that calculates all the normalized yields and their error, and returns by reference
      * @param Yield Vector of normalized yields returned by reference
      * @param YieldError Vector of normalized yield errors returned by reference
+     * @param Normalization A normalization constant for the predicted yield that is equal to 1 when the yields are normalized
      */
-    void CalculateNormalizedYields(double rDcosDelta, double rDsinDelta, BinVector<double> &Yield, BinVector<double> &YieldError) const;
+    void CalculateNormalizedYields(double Normalization, double rDcosDelta, double rDsinDelta, BinVector<double> &Yield, BinVector<double> &YieldError) const;
     /**
      * Function that prints the hadronic parameters
      */
