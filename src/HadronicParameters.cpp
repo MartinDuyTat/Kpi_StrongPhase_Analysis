@@ -10,16 +10,18 @@
 HadronicParameters::HadronicParameters(): m_NBins(0) {
 }
 
-HadronicParameters::HadronicParameters(const std::string &Filename, int NBins, const std::string &K0Mode): m_NBins(NBins), m_K0Mode(K0Mode), m_Ki(BinVector<double>(true, m_NBins)), m_KiError(BinVector<double>(true, m_NBins)), m_ci(BinVector<double>(false, m_NBins)), m_si(BinVector<double>(false, m_NBins)) {
+HadronicParameters::HadronicParameters(const std::string &Filename, int NBins, const std::string &K0Mode): m_NBins(NBins), m_K0Mode(K0Mode), m_Ki(BinVector<double>(true, m_NBins)), m_KiError(BinVector<double>(true, m_NBins)), m_ci(BinVector<double>(false, m_NBins)), m_ciError(BinVector<double>(false, m_NBins)), m_si(BinVector<double>(false, m_NBins)), m_siError(BinVector<double>(false, m_NBins)) {
   std::ifstream Infile(Filename);
   std::string line;
   while(std::getline(Infile, line)) {
     std::stringstream ss(line);
     int i;
-    double ci, si, Ki, KiError, Kbari, KbariError;
-    ss >> i >> ci >> si >> Ki >> KiError >> Kbari >> KbariError;
+    double ci, ciError, si, siError, Ki, KiError, Kbari, KbariError;
+    ss >> i >> ci >> ciError >> si >> siError >> Ki >> KiError >> Kbari >> KbariError;
     m_ci[i] = ci;
+    m_ciError[i] = ciError;
     m_si[i] = si;
+    m_siError[i] = siError;
     m_Ki[i] = Ki;
     m_Ki[-i] = Kbari;
     m_KiError[i] = KiError;
@@ -42,7 +44,8 @@ double HadronicParameters::Getci(int Bin) const {
 }
 
 double HadronicParameters::Getsi(int Bin) const {
-  return m_si[TMath::Abs(Bin)];
+  int Sign = Bin > 0 ? +1 : -1;
+  return Sign*m_si[TMath::Abs(Bin)];
 }
 
 double HadronicParameters::GetKi(int Bin) const {
@@ -67,27 +70,36 @@ double HadronicParameters::CalculateYield(int Bin, double rDcosDelta, double rDs
     throw std::invalid_argument("Invalid K0 mode");
   }
   int CP = m_K0Mode == "KS" ? +1 : -1;
-  return m_Ki[Bin] + (rDcosDelta*rDcosDelta + rDsinDelta*rDsinDelta)*m_Ki[-Bin] - 2*CP*TMath::Sqrt(m_Ki[Bin]*m_Ki[-Bin])*(m_ci[TMath::Abs(Bin)]*rDcosDelta - m_si[TMath::Abs(Bin)]*rDsinDelta);
+  return m_Ki[Bin] + (rDcosDelta*rDcosDelta + rDsinDelta*rDsinDelta)*m_Ki[-Bin] - 2*CP*TMath::Sqrt(m_Ki[Bin]*m_Ki[-Bin])*(Getci(Bin)*rDcosDelta - Getsi(Bin)*rDsinDelta);
 }
 
-double HadronicParameters::CalculateYieldError(int Bin, double rDcosDelta, double rDsinDelta) const {
-  double KiDerivative = 1 + TMath::Sqrt(m_Ki[-Bin]/m_Ki[Bin])*(m_ci[TMath::Abs(Bin)]*rDcosDelta - m_si[TMath::Abs(Bin)]*rDsinDelta);
-  double KbariDerivative = (rDcosDelta*rDcosDelta + rDsinDelta*rDsinDelta) + TMath::Sqrt(m_Ki[Bin]/m_Ki[-Bin])*(m_ci[TMath::Abs(Bin)]*rDcosDelta - m_si[TMath::Abs(Bin)]*rDsinDelta);
+double HadronicParameters::CalculateYieldKiError(int Bin, double rDcosDelta, double rDsinDelta) const {
+  int CP = m_K0Mode == "KS" ? +1 : -1;
+  double KiDerivative = 1 - CP*TMath::Sqrt(m_Ki[-Bin]/m_Ki[Bin])*(Getci(Bin)*rDcosDelta - Getsi(Bin)*rDsinDelta);
+  double KbariDerivative = (rDcosDelta*rDcosDelta + rDsinDelta*rDsinDelta) - CP*TMath::Sqrt(m_Ki[Bin]/m_Ki[-Bin])*(Getci(Bin)*rDcosDelta - Getsi(Bin)*rDsinDelta);
   return TMath::Sqrt(TMath::Power(KiDerivative*m_KiError[Bin], 2) + TMath::Power(KbariDerivative*m_KiError[-Bin], 2));
 }
 
-void HadronicParameters::CalculateNormalizedYields(double Normalization, double rDcosDelta, double rDsinDelta, BinVector<double> &Yield, BinVector<double> &YieldError) const {
+double HadronicParameters::CalculateYieldcisiError(int Bin, double rDcosDelta, double rDsinDelta) const {
+  int CP = m_K0Mode == "KS" ? +1 : -1;
+  double ciDerivative = -CP*2*TMath::Sqrt(m_Ki[Bin]*m_Ki[-Bin])*rDcosDelta;
+  double siDerivative = CP*2*TMath::Sqrt(m_Ki[Bin]*m_Ki[-Bin])*rDsinDelta;
+  return TMath::Sqrt(TMath::Power(ciDerivative*m_ciError[TMath::Abs(Bin)], 2) + TMath::Power(siDerivative*m_siError[TMath::Abs(Bin)], 2));
+}
+
+void HadronicParameters::CalculateNormalizedYields(double Normalization, double rDcosDelta, double rDsinDelta, BinVector<double> &Yield, BinVector<double> &YieldKiError, BinVector<double> &YieldcisiError) const {
   Yield = BinVector<double>(true, m_NBins);
-  YieldError = BinVector<double>(true, m_NBins);
-  for(int i = 1; i <= m_NBins; i++) {
-    Yield[i] = CalculateYield(i, rDcosDelta, rDsinDelta);
-    Yield[-i] = CalculateYield(-i, rDcosDelta, rDsinDelta);
-    YieldError[i] = CalculateYieldError(i, rDcosDelta, rDsinDelta);
-    YieldError[-i] = CalculateYieldError(-i, rDcosDelta, rDsinDelta);
+  YieldKiError = BinVector<double>(true, m_NBins);
+  YieldcisiError = BinVector<double>(true, m_NBins);
+  for(auto Bin : Yield.GetBinNumbers()) {
+    Yield[Bin] = CalculateYield(Bin, rDcosDelta, rDsinDelta);
+    YieldKiError[Bin] = CalculateYieldKiError(Bin, rDcosDelta, rDsinDelta);
+    YieldcisiError[Bin] = CalculateYieldcisiError(Bin, rDcosDelta, rDsinDelta);
   }
   double NormalizationConstant = NormalizeYield(rDcosDelta, rDsinDelta);
   std::transform(Yield.begin(), Yield.end(), Yield.begin(), [&NormalizationConstant, Normalization](auto &c){return Normalization*NormalizationConstant*c;});
-  std::transform(YieldError.begin(), YieldError.end(), YieldError.begin(), [&NormalizationConstant, &Normalization](auto &c){return Normalization*NormalizationConstant*c;});
+  std::transform(YieldKiError.begin(), YieldKiError.end(), YieldKiError.begin(), [&NormalizationConstant, &Normalization](auto &c){return Normalization*NormalizationConstant*c;});
+  std::transform(YieldcisiError.begin(), YieldcisiError.end(), YieldcisiError.begin(), [&NormalizationConstant, &Normalization](auto &c){return Normalization*NormalizationConstant*c;});
 }
 
 void HadronicParameters::PrintHadronicParameters() const {

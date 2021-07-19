@@ -4,6 +4,7 @@
 #define CHI2DOUBLETAGYIELD
 
 #include<vector>
+#include<string>
 #include"DoubleTagMeasurement.h"
 
 /**
@@ -14,8 +15,9 @@ class Chi2DoubleTagYield {
     /**
      * Constructor that fixed the normalization by default
      * @param FixNormalization True if normalization is fixed to 1
+     * @param ErrorCategory The type of error considered in the fit, "Kpi", "Ki" or "cisi"
      */
-    Chi2DoubleTagYield(bool FixNormalization);
+    Chi2DoubleTagYield(bool FixNormalization, const std::string &ErrorCategory);
     /**
      * Function for adding a measurement
      * @param Measurement A DoubleTagMeasurement object to be added
@@ -58,6 +60,10 @@ class Chi2DoubleTagYield {
      * Flag that is true when the normalization is fixed to 1
      */
     bool m_FixNormalization;
+    /**
+     * The error type considered, "Kpi", "Ki" or "cisi"
+     */
+    std::string m_ErrorCategory;
     /**
      * Vector of measurements
      */

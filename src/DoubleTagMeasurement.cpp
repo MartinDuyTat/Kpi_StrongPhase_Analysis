@@ -12,15 +12,24 @@ DoubleTagMeasurement::DoubleTagMeasurement(int NBins, const std::string &K0Mode,
   m_DTYields.PrintYields();
 }
 
-double DoubleTagMeasurement::GetChi2(double Normalization, double rDcosDelta, double rDsinDelta) {
-  BinVector<double> YieldPredictions, YieldErrorPredictions;
-  m_HParameters.CalculateNormalizedYields(Normalization, rDcosDelta, rDsinDelta, YieldPredictions, YieldErrorPredictions);
+double DoubleTagMeasurement::GetChi2(double Normalization, double rDcosDelta, double rDsinDelta, const std::string &ErrorCategory) {
+  BinVector<double> YieldPredictions, YieldKiErrorPredictions, YieldcisiErrorPredictions;
+  m_HParameters.CalculateNormalizedYields(Normalization, rDcosDelta, rDsinDelta, YieldPredictions, YieldKiErrorPredictions, YieldcisiErrorPredictions);
   double Chi2 = 0.0;
   for(int Bin = -m_NBins; Bin <= m_NBins; Bin++ ) {
     if(Bin == 0) {
       continue;
     }
-    double ErrorSquared = TMath::Power(m_DTYields.GetYieldError(Bin), 2) + TMath::Power(YieldErrorPredictions[Bin], 2);
+    double ErrorSquared = 0.0;
+    if(ErrorCategory.find("Kpi") != std::string::npos) {
+      ErrorSquared += TMath::Power(m_DTYields.GetYieldError(Bin), 2);
+    }
+    if(ErrorCategory.find("Ki") != std::string::npos) {
+      ErrorSquared += TMath::Power(YieldKiErrorPredictions[Bin], 2);
+    }
+    if(ErrorCategory.find("cisi") != std::string::npos) {
+      ErrorSquared += TMath::Power(YieldcisiErrorPredictions[Bin], 2);
+    }
     Chi2 += TMath::Power(YieldPredictions[Bin] - m_DTYields.GetYield(Bin), 2)/ErrorSquared;
   }
   return Chi2;

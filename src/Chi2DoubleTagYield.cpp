@@ -1,11 +1,12 @@
 // Martin Duy Tat 13th May 2021
 
+#include<string>
 #include"Chi2DoubleTagYield.h"
 #include"DoubleTagMeasurement.h"
 #include"Minuit2/Minuit2Minimizer.h"
 #include"Math/Functor.h"
 
-Chi2DoubleTagYield::Chi2DoubleTagYield(bool FixNormalization): m_FixNormalization(FixNormalization) {
+Chi2DoubleTagYield::Chi2DoubleTagYield(bool FixNormalization, const std::string &ErrorCategory): m_FixNormalization(FixNormalization), m_ErrorCategory(ErrorCategory) {
 }
 
 void Chi2DoubleTagYield::AddMeasurement(const DoubleTagMeasurement &Measurement) {
@@ -21,7 +22,7 @@ double Chi2DoubleTagYield::operator()(const double *params) {
   }
   double Chi2 = 0.0;
   for(unsigned int i = 0; i < m_Measurements.size(); i++) {
-    Chi2 += m_Measurements[i].GetChi2(Normalizations[i], rDcosDelta, rDsinDelta);
+    Chi2 += m_Measurements[i].GetChi2(Normalizations[i], rDcosDelta, rDsinDelta, m_ErrorCategory);
   }
   return Chi2;
 }

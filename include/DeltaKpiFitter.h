@@ -15,8 +15,9 @@ class DeltaKpiFitter {
      * Constructor that sets up the measurements that are fitted
      * @param Filename Filename of text file with paths to different measurements
      * @param FixNormalization Flag that fixes the normalization if it's true
+     * @param ErrorCategory The type of error considered in the fit, "Kpi", "Ki" or "cisi"
      */
-    DeltaKpiFitter(const std::string &Filename, bool FixNormalization = true);
+    DeltaKpiFitter(const std::string &Filename, bool FixNormalization = true, const std::string &ErrorCategory = "Kpi");
     /**
      * Run the fit and save measurements
      * @param Filename Filename of text file to save results to

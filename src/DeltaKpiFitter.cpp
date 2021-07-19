@@ -7,7 +7,7 @@
 #include"DeltaKpiFitter.h"
 #include"DoubleTagMeasurement.h"
 
-DeltaKpiFitter::DeltaKpiFitter(const std::string &Filename, bool FixNormalization): m_Measurements(Chi2DoubleTagYield(FixNormalization)) {
+DeltaKpiFitter::DeltaKpiFitter(const std::string &Filename, bool FixNormalization, const std::string &ErrorCategory): m_Measurements(Chi2DoubleTagYield(FixNormalization, ErrorCategory)) {
   std::ifstream Infile(Filename);
   std::string line;
   int N = 0;

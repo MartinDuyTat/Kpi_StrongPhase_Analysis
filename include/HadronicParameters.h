@@ -57,16 +57,20 @@ class HadronicParameters {
      */
     double CalculateYield(int Bin, double rDcosDelta, double rDsinDelta) const;
     /**
-     * Function that calculates the error on the raw predicted yield
+     * Function that calculates the error on the raw predicted yield from the Ki
      */
-    double CalculateYieldError(int Bin, double rDcosDelta, double rDsinDelta) const;
+    double CalculateYieldKiError(int Bin, double rDcosDelta, double rDsinDelta) const;
+    /**
+     * Function that calculates the error on the raw predicted yield from the ci and si
+     */
+    double CalculateYieldcisiError(int Bin, double rDcosDelta, double rDsinDelta) const;
     /**
      * Function that calculates all the normalized yields and their error, and returns by reference
      * @param Yield Vector of normalized yields returned by reference
      * @param YieldError Vector of normalized yield errors returned by reference
      * @param Normalization A normalization constant for the predicted yield that is equal to 1 when the yields are normalized
      */
-    void CalculateNormalizedYields(double Normalization, double rDcosDelta, double rDsinDelta, BinVector<double> &Yield, BinVector<double> &YieldError) const;
+    void CalculateNormalizedYields(double Normalization, double rDcosDelta, double rDsinDelta, BinVector<double> &Yield, BinVector<double> &YieldKiError, BinVector<double> &YieldcisiError) const;
     /**
      * Function that prints the hadronic parameters
      */
@@ -85,7 +89,7 @@ class HadronicParameters {
      */
     BinVector<double> m_Ki;
     /**
-     * Error on the fxractional yields \f$K_i\f$
+     * Error on the fractional yields \f$K_i\f$
      */
     BinVector<double> m_KiError;
     /**
@@ -93,9 +97,17 @@ class HadronicParameters {
      */
     BinVector<double> m_ci;
     /**
+     * Error on the cosine of strong phase \f$c_i\f$
+     */
+    BinVector<double> m_ciError;
+    /**
      * Sine of strong phase \f$c_i\f$
      */
     BinVector<double> m_si;
+    /**
+     * Error on sine of strong phase \f$c_i\f$
+     */
+    BinVector<double> m_siError;
 };
 
 #endif

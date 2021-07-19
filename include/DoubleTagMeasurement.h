@@ -23,7 +23,7 @@ class DoubleTagMeasurement {
     /**
      * Function for obtaining the \f$\chi^2\f$ of the double tag yield, compared with the prediction from hadronic parameters
      */
-    double GetChi2(double Normalization, double rDcosDelta, double rDsinDelta);
+    double GetChi2(double Normalization, double rDcosDelta, double rDsinDelta, const std::string &ErrorCategory);
     /**
      * Get the number of bins
      */
