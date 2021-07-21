@@ -6,6 +6,7 @@
 #include<vector>
 #include<string>
 #include"DoubleTagMeasurement.h"
+#include"Minuit2/Minuit2Minimizer.h"
 
 /**
  * Chi2DoubleTagYield is a class for combining different measurements and getting the total \f$\chi^2\f$
@@ -31,6 +32,10 @@ class Chi2DoubleTagYield {
      * Run Minuit to minimiza the \f$\chi^2\f$
      */
     void MinimizeChi2();
+    /**
+     * Function that plots the 1, 2, 3 sigma contours of the results
+     */
+    void DrawContours(ROOT::Minuit2::Minuit2Minimizer *Minimizer, const std::string &Filename) const;
     /**
      * Get fitted value of \f$r_D\cos(\delta)\f$
      */

@@ -1,10 +1,14 @@
 // Martin Duy Tat 13th May 2021
 
 #include<string>
+#include<vector>
+#include<iostream>
 #include"Chi2DoubleTagYield.h"
 #include"DoubleTagMeasurement.h"
 #include"Minuit2/Minuit2Minimizer.h"
 #include"Math/Functor.h"
+#include"TCanvas.h"
+#include"TGraph.h"
 
 Chi2DoubleTagYield::Chi2DoubleTagYield(bool FixNormalization, const std::string &ErrorCategory): m_FixNormalization(FixNormalization), m_ErrorCategory(ErrorCategory) {
 }
@@ -50,6 +54,41 @@ void Chi2DoubleTagYield::MinimizeChi2() {
   m_ErrorrDcosDelta = Errors[0];
   m_ErrorrDsinDelta = Errors[1];
   m_Chi2 = Minimizer.MinValue()/static_cast<double>(GetDegreesOfFreedom());
+  std::cout << "Plot contours? ";
+  std::string Answer;
+  std::cin >> Answer;
+  if(Answer == "yes") {
+    std::cout << "Filename: ";
+    std::string Filename;
+    std::cin >> Filename;
+    DrawContours(&Minimizer, Filename);
+  }
+}
+
+void Chi2DoubleTagYield::DrawContours(ROOT::Minuit2::Minuit2Minimizer *Minimizer, const std::string &Filename) const {
+  unsigned int Npoints = 100;
+  std::vector<double> x(Npoints + 1), y(Npoints + 1);
+  TCanvas c("c", "c", 1200, 900);
+  Minimizer->SetErrorDef(9.0);
+  Minimizer->Contour(0, 1, Npoints, x.data(), y.data());
+  x[Npoints] = x[0];
+  y[Npoints] = y[0];
+  TGraph gr1(Npoints + 1, x.data(), y.data());
+  gr1.Draw("AC");
+  gr1.SetTitle("r_{D}^{K#pi}cos#delta_{D}^{K#pi} vs r_{D}^{K#pi}sin#delta_{D}^{K#pi};r_{D}^{K#pi}cos#delta_{D}^{K#pi};r_{D}^{K#pi}sin#delta_{D}^{K#pi}");
+  Minimizer->SetErrorDef(4.0);
+  Minimizer->Contour(0, 1, Npoints, x.data(), y.data());
+  x[Npoints] = x[0];
+  y[Npoints] = y[0];
+  TGraph gr2(Npoints + 1, x.data(), y.data());
+  gr2.Draw("C");
+  Minimizer->SetErrorDef(1.0);
+  Minimizer->Contour(0, 1, Npoints, x.data(), y.data());
+  x[Npoints] = x[0];
+  y[Npoints] = y[0];
+  TGraph gr3(Npoints + 1, x.data(), y.data());
+  gr3.Draw("C");
+  c.SaveAs(Filename.c_str());
 }
 
 double Chi2DoubleTagYield::GetFittedrDcosDelta() const {
