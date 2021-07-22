@@ -2,6 +2,7 @@
 
 #include<iostream>
 #include<string>
+#include<vector>
 #include"BinVector.h"
 #include"DoubleTagMeasurement.h"
 
@@ -10,6 +11,8 @@ DoubleTagMeasurement::DoubleTagMeasurement(int NBins, const std::string &K0Mode,
   m_HParameters.PrintHadronicParameters();
   std::cout << "Adding the following double tag yields from the file " << DTYieldsFilename << ":\n";
   m_DTYields.PrintYields();
+  std::string hh = (NBins == 8 ? "pipi" : "KK");
+  m_Mode = K0Mode + hh;
 }
 
 double DoubleTagMeasurement::GetChi2(double Normalization, double rDcosDelta, double rDsinDelta, const std::string &ErrorCategory) {
@@ -37,4 +40,20 @@ double DoubleTagMeasurement::GetChi2(double Normalization, double rDcosDelta, do
 
 int DoubleTagMeasurement::GetNBins() const {
   return m_NBins;
+}
+
+void DoubleTagMeasurement::SmearKi() {
+  m_HParameters.SmearKi();
+}
+
+void DoubleTagMeasurement::Smearcisi(const std::vector<double> &Smearing) {
+  m_HParameters.Smearcisi(Smearing);
+}
+
+void DoubleTagMeasurement::RemoveSmearing() {
+  m_HParameters.RemoveSmearing();
+}
+
+std::string DoubleTagMeasurement::Mode() const {
+  return m_Mode;
 }

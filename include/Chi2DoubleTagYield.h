@@ -6,6 +6,7 @@
 #include<vector>
 #include<string>
 #include"DoubleTagMeasurement.h"
+#include"cisiCovariance.h"
 #include"Minuit2/Minuit2Minimizer.h"
 
 /**
@@ -21,15 +22,18 @@ class Chi2DoubleTagYield {
     Chi2DoubleTagYield(bool FixNormalization, const std::string &ErrorCategory);
     /**
      * Function for adding a measurement
-     * @param Measurement A DoubleTagMeasurement object to be added
+     * @param NBins Number of bins
+     * @param K0Mode "KS" or "KL"
+     * @param HParameterFilename File with hadronic parameters
+     * @param DTYieldFilename File with double tag yields
      */
-    void AddMeasurement(const DoubleTagMeasurement &Measurement);
+    void AddMeasurement(int NBins, const std::string &K0Mode, const std::string &HParameterFilename, const std::string &DTYieldFilename);
     /**
      * () operator overload to easily get the total \f$\chi^2\f$
      */
     double operator()(const double *params);
     /**
-     * Run Minuit to minimiza the \f$\chi^2\f$
+     * Run Minuit to minimize the \f$\chi^2\f$
      */
     void MinimizeChi2();
     /**
@@ -60,6 +64,15 @@ class Chi2DoubleTagYield {
      * Get the number of degree of freedom
      */
     int GetDegreesOfFreedom() const;
+    /**
+     * Run \f$K_i\f$ systematics by smearing \f$K_i\f$ and do 1000 fits
+     * @param Systematics "Ki" or "cisi"
+     * @param rDcosDelta_Bias The bias in \f$r_D\cos(\delta)\f$ under smearing
+     * @param rDsinDelta_Bias The bias in \f$r_D\sin(\delta)\f$ under smearing
+     * @param rDcosDelta_Syst The systematic uncertainty in \f$r_D\cos(\delta)\f$ under smearing
+     * @param rDsinDelta_Syst The systematic uncertainty in \f$r_D\sin(\delta)\f$ under smearing
+     */
+    void RunSystematics(const std::string &Systematics, double &rDcosDelta_Bias, double &rDsinDelta_Bias, double &rDcosDelta_Syst, double &rDsinDelta_Syst);
   private:
     /**
      * Flag that is true when the normalization is fixed to 1
@@ -93,6 +106,14 @@ class Chi2DoubleTagYield {
      * \f$\chi^2\f$ per degree of freedom of fit
      */
     double m_Chi2;
+    /**
+     * Object containing all the covariance matrices for the \f$c_i, s_i\f$
+     */
+    cisiCovariance m_cisiCovariance;
+    /**
+     * Helper function that sets up Minuit2 and runs the minimization
+     */
+    ROOT::Minuit2::Minuit2Minimizer* RunMinimization(double &rDcosDelta, double &rDsinDelta, double &rDcosDeltaError, double &rDsinDeltaError, double &Chi2) const;
 };
 
 #endif

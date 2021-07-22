@@ -3,8 +3,11 @@
 #include<string>
 #include<vector>
 #include<iostream>
+#include<stdexcept>
+#include<iostream>
 #include"Chi2DoubleTagYield.h"
 #include"DoubleTagMeasurement.h"
+#include"TMath.h"
 #include"Minuit2/Minuit2Minimizer.h"
 #include"Math/Functor.h"
 #include"TCanvas.h"
@@ -13,8 +16,9 @@
 Chi2DoubleTagYield::Chi2DoubleTagYield(bool FixNormalization, const std::string &ErrorCategory): m_FixNormalization(FixNormalization), m_ErrorCategory(ErrorCategory) {
 }
 
-void Chi2DoubleTagYield::AddMeasurement(const DoubleTagMeasurement &Measurement) {
-  m_Measurements.push_back(Measurement);
+void Chi2DoubleTagYield::AddMeasurement(int NBins, const std::string &K0Mode, const std::string &HParameterFilename, const std::string &DTYieldFilename) {
+  m_Measurements.push_back(DoubleTagMeasurement(NBins, K0Mode, HParameterFilename, DTYieldFilename));
+  m_cisiCovariance.AddDataset(m_Measurements.back().Mode(), HParameterFilename);
 }
 
 double Chi2DoubleTagYield::operator()(const double *params) {
@@ -31,29 +35,34 @@ double Chi2DoubleTagYield::operator()(const double *params) {
   return Chi2;
 }
 
-void Chi2DoubleTagYield::MinimizeChi2() {
-  ROOT::Minuit2::Minuit2Minimizer Minimizer;
+ROOT::Minuit2::Minuit2Minimizer* Chi2DoubleTagYield::RunMinimization(double &rDcosDelta, double &rDsinDelta, double &rDcosDeltaError, double &rDsinDeltaError, double &Chi2) const {
+  ROOT::Minuit2::Minuit2Minimizer *Minimizer = new ROOT::Minuit2::Minuit2Minimizer;
   ROOT::Math::Functor fcn(*this, 2 + m_Measurements.size());
-  Minimizer.SetFunction(fcn);
-  Minimizer.SetVariable(0, "rDcosDelta", 0.0, 1.0);
-  Minimizer.SetVariable(1, "rDsinDelta", 0.0, 1.0);
+  Minimizer->SetFunction(fcn);
+  Minimizer->SetVariable(0, "rDcosDelta", 0.0, 1.0);
+  Minimizer->SetVariable(1, "rDsinDelta", 0.0, 1.0);
   for(unsigned int i = 0; i < m_Measurements.size(); i++) {
-    Minimizer.SetVariable(i + 2, std::string("Normalization") + std::to_string(i), 0.9, 1.1);
+    Minimizer->SetVariable(i + 2, std::string("Normalization") + std::to_string(i), 0.9, 1.1);
   }
   if(m_FixNormalization) {
     for(unsigned int i = 0; i < m_Measurements.size(); i++) {
-      Minimizer.SetVariableValue(i + 2, 1.0);
-      Minimizer.FixVariable(i + 2);
+      Minimizer->SetVariableValue(i + 2, 1.0);
+      Minimizer->FixVariable(i + 2);
     }
   }
-  Minimizer.Minimize();
-  const double *Results = Minimizer.X();
-  const double *Errors = Minimizer.Errors();
-  m_FittedrDcosDelta = Results[0];
-  m_FittedrDsinDelta = Results[1];
-  m_ErrorrDcosDelta = Errors[0];
-  m_ErrorrDsinDelta = Errors[1];
-  m_Chi2 = Minimizer.MinValue()/static_cast<double>(GetDegreesOfFreedom());
+  Minimizer->Minimize();
+  const double *Results = Minimizer->X();
+  const double *Errors = Minimizer->Errors();
+  rDcosDelta = Results[0];
+  rDsinDelta = Results[1];
+  rDcosDeltaError = Errors[0];
+  rDsinDeltaError = Errors[1];
+  Chi2 = Minimizer->MinValue()/static_cast<double>(GetDegreesOfFreedom());
+  return Minimizer;
+}
+
+void Chi2DoubleTagYield::MinimizeChi2() {
+  ROOT::Minuit2::Minuit2Minimizer *Minimizer = RunMinimization(m_FittedrDcosDelta, m_FittedrDsinDelta, m_ErrorrDcosDelta, m_ErrorrDsinDelta, m_Chi2);
   std::cout << "Plot contours? ";
   std::string Answer;
   std::cin >> Answer;
@@ -61,8 +70,9 @@ void Chi2DoubleTagYield::MinimizeChi2() {
     std::cout << "Filename: ";
     std::string Filename;
     std::cin >> Filename;
-    DrawContours(&Minimizer, Filename);
+    DrawContours(Minimizer, Filename);
   }
+  delete Minimizer;
 }
 
 void Chi2DoubleTagYield::DrawContours(ROOT::Minuit2::Minuit2Minimizer *Minimizer, const std::string &Filename) const {
@@ -89,6 +99,43 @@ void Chi2DoubleTagYield::DrawContours(ROOT::Minuit2::Minuit2Minimizer *Minimizer
   TGraph gr3(Npoints + 1, x.data(), y.data());
   gr3.Draw("C");
   c.SaveAs(Filename.c_str());
+}
+
+void Chi2DoubleTagYield::RunSystematics(const std::string &Systematics, double &rDcosDelta_Bias, double &rDsinDelta_Bias, double &rDcosDelta_Syst, double &rDsinDelta_Syst) {
+  int NFits = 100000;
+  if(Systematics != "Ki" && Systematics != "cisi") {
+    throw std::invalid_argument("Unknown systematics");
+  }
+  if(Systematics != "Ki") {
+    m_cisiCovariance.PrepareCholesky();
+  }
+  std::cout << "Running many fits for systematics\n";
+  std::vector<double> rDcosDeltaFit(NFits), rDsinDeltaFit(NFits);
+  for(int i = 0; i < NFits; i++) {
+    if(i%(NFits/10) == 0) {
+      std::cout << "Fit number " << i << "\n";
+    }
+    if(Systematics != "Ki") {
+      m_cisiCovariance.Smear();
+    }
+    for(auto& Measurement : m_Measurements) {
+      if(Systematics == "Ki") {
+	Measurement.SmearKi();
+      } else {
+	std::string Mode = Measurement.Mode();	
+	Measurement.Smearcisi(m_cisiCovariance.GetSmearing(Mode));
+      }
+    }
+    double dummy;
+    RunMinimization(rDcosDeltaFit[i], rDsinDeltaFit[i], dummy, dummy, dummy);
+  }
+  for(auto& Measurement : m_Measurements) {
+    Measurement.RemoveSmearing();
+  }
+  rDcosDelta_Bias = TMath::Mean(rDcosDeltaFit.begin(), rDcosDeltaFit.end());
+  rDsinDelta_Bias = TMath::Mean(rDsinDeltaFit.begin(), rDsinDeltaFit.end());
+  rDcosDelta_Syst = TMath::RMS(rDcosDeltaFit.begin(), rDcosDeltaFit.end());
+  rDsinDelta_Syst = TMath::RMS(rDsinDeltaFit.begin(), rDsinDeltaFit.end());
 }
 
 double Chi2DoubleTagYield::GetFittedrDcosDelta() const {

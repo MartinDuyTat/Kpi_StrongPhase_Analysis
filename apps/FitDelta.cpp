@@ -16,6 +16,6 @@ int main(int argc, char *argv[]) {
   }
   KpiSettings::Get().Initialize(std::string(argv[1]));
   DeltaKpiFitter Fitter(KpiSettings::Get().GetString("Datasets"), KpiSettings::Get().GetInt("FixNormalization") == 1, KpiSettings::Get().GetString("ErrorCategory"));
-  Fitter.RunFit(KpiSettings::Get().GetString("ResultsFile"));
+  Fitter.RunFit(KpiSettings::Get().GetString("ResultsFile"), KpiSettings::Get().GetInt("RunKiSystematics") == 1, KpiSettings::Get().GetInt("RuncisiSystematics") == 1);
   return 0;
 }

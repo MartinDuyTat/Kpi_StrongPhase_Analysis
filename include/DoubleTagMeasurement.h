@@ -7,6 +7,7 @@
 #define DOUBLETAGMEASUREMENT
 
 #include<string>
+#include<vector>
 #include"HadronicParameters.h"
 #include"DoubleTagYields.h"
 
@@ -27,7 +28,24 @@ class DoubleTagMeasurement {
     /**
      * Get the number of bins
      */
-    int GetNBins() const ;
+    int GetNBins() const;
+    /**
+     * Smear \f$K_i\f$ for systematics studies
+     */
+    void SmearKi();
+    /**
+     * Smear \f$c_i, s_i\f$ for systematics studies
+     * @param A vector with smearing in the order c_1, c_2, ..., s_1, s_2, ...
+     */
+    void Smearcisi(const std::vector<double> &Smearing);
+    /**
+     * Remove all smearing
+     */
+    void RemoveSmearing();
+    /**
+     * Get the tag mode, "KSKK", "KLKK", "KSpipi" or "KLpipi"
+     */
+    std::string Mode() const;
   private:
     /**
      * Number of bins (not counting negative bins)
@@ -41,6 +59,10 @@ class DoubleTagMeasurement {
      * Double tag yields
      */
     DoubleTagYields m_DTYields;
+    /**
+     * The tag mode of this dataset
+     */
+    std::string m_Mode;
 };
 
 #endif

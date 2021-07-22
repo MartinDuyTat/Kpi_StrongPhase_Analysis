@@ -19,10 +19,12 @@ class DeltaKpiFitter {
      */
     DeltaKpiFitter(const std::string &Filename, bool FixNormalization = true, const std::string &ErrorCategory = "Kpi");
     /**
-     * Run the fit and save measurements
+     * Run the fit, run \f$K_i\f$ systematics, run \f$c_i, s_i\f$ systematics and save measurements
      * @param Filename Filename of text file to save results to
+     * @param RunKiSystematics Set to true to do a \f$K_i\f$ systematics study
+     * @param RuncisiSystematics Set to true to do a \f$c_i, s_i\f$  systematics study
      */
-    void RunFit(const std::string &Filename);
+    void RunFit(const std::string &Filename, bool RunKiSystematics = false, bool RuncisiSystematics = false);
   private:
     /**
      * Object containing the measurements

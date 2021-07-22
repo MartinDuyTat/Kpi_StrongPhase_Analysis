@@ -3,8 +3,11 @@
 #ifndef HADRONICPARAMETERS
 #define HADRONICPARAMETERS
 
+#include<string>
+#include<vector>
 #include"BinVector.h"
 #include"TMath.h"
+#include"TMatrixT.h"
 
 /**
  * HadronicParameters is a class that stores the hadronic parameters \f$K_i\f$, \f$c_i\f$ and \f$s_i\f$ for a particular decay
@@ -75,6 +78,18 @@ class HadronicParameters {
      * Function that prints the hadronic parameters
      */
     void PrintHadronicParameters() const;
+    /**
+     * Smear \f$K_i\f$ for systematics studies
+     */
+    void SmearKi();
+    /**
+     * Smear \f$c_i, s_i\f$ for systematics studies
+     */
+    void Smearcisi(const std::vector<double> &Smearing);
+    /**
+     * Remove all smearing
+     */
+    void RemoveSmearing();
   private:
     /**
      * Number of bins (not counting negative bins);
@@ -108,6 +123,22 @@ class HadronicParameters {
      * Error on sine of strong phase \f$c_i\f$
      */
     BinVector<double> m_siError;
+    /**
+     * Smearing of \f$K_i\f$ for systematics studies
+     */
+    BinVector<double> m_KiSmearing;
+    /**
+     * Smearing of \f$c_i\f$ for systematics studies
+     */
+    BinVector<double> m_ciSmearing;
+    /**
+     * Smearing of \f$s_i\f$ for systematics studies
+     */
+    BinVector<double> m_siSmearing;
+    /**
+     * Cholesky decomposition of the covariance matrix such that \f$LL^T\f$ is the covariance matrix of \f$c_i, s_i\f$
+     */
+    TMatrixT<double> m_Covariance_Cholesky;
 };
 
 #endif

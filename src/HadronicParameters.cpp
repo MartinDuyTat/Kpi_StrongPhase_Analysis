@@ -6,22 +6,23 @@
 #include"HadronicParameters.h"
 #include"BinVector.h"
 #include"TMath.h"
+#include"TRandom3.h"
 
 HadronicParameters::HadronicParameters(): m_NBins(0) {
 }
 
-HadronicParameters::HadronicParameters(const std::string &Filename, int NBins, const std::string &K0Mode): m_NBins(NBins), m_K0Mode(K0Mode), m_Ki(BinVector<double>(true, m_NBins)), m_KiError(BinVector<double>(true, m_NBins)), m_ci(BinVector<double>(false, m_NBins)), m_ciError(BinVector<double>(false, m_NBins)), m_si(BinVector<double>(false, m_NBins)), m_siError(BinVector<double>(false, m_NBins)) {
+HadronicParameters::HadronicParameters(const std::string &Filename, int NBins, const std::string &K0Mode): m_NBins(NBins), m_K0Mode(K0Mode), m_Ki(BinVector<double>(true, m_NBins)), m_KiError(BinVector<double>(true, m_NBins)), m_ci(BinVector<double>(false, m_NBins)), m_ciError(BinVector<double>(false, m_NBins)), m_si(BinVector<double>(false, m_NBins)), m_siError(BinVector<double>(false, m_NBins)), m_KiSmearing(BinVector<double>(true, m_NBins)), m_ciSmearing(BinVector<double>(false, m_NBins)), m_siSmearing(BinVector<double>(false, m_NBins)), m_Covariance_Cholesky(TMatrixT<double>(2*m_NBins, 2*m_NBins)) {
   std::ifstream Infile(Filename);
   std::string line;
-  while(std::getline(Infile, line)) {
+  for(int i = 1; i <= m_NBins; i++) {
+    std::getline(Infile, line);
     std::stringstream ss(line);
-    int i;
-    double ci, ciError, si, siError, Ki, KiError, Kbari, KbariError;
-    ss >> i >> ci >> ciError >> si >> siError >> Ki >> KiError >> Kbari >> KbariError;
+    double ci, ciErrorStat, ciErrorSyst, si, siErrorStat, siErrorSyst, Ki, KiError, Kbari, KbariError, dummy;
+    ss >> dummy >> ci >> ciErrorStat >> ciErrorSyst >> si >> siErrorStat >> siErrorSyst >> Ki >> KiError >> Kbari >> KbariError;
     m_ci[i] = ci;
-    m_ciError[i] = ciError;
+    m_ciError[i] = TMath::Sqrt(ciErrorStat*ciErrorStat + ciErrorSyst*ciErrorSyst);
     m_si[i] = si;
-    m_siError[i] = siError;
+    m_siError[i] = TMath::Sqrt(siErrorStat*siErrorStat + siErrorSyst*siErrorSyst);
     m_Ki[i] = Ki;
     m_Ki[-i] = Kbari;
     m_KiError[i] = KiError;
@@ -40,16 +41,16 @@ std::string HadronicParameters::CreateYieldFormula(int Bin) const {
 }
 
 double HadronicParameters::Getci(int Bin) const {
-  return m_ci[TMath::Abs(Bin)];
+  return m_ci[TMath::Abs(Bin)] + m_ciSmearing[TMath::Abs(Bin)];
 }
 
 double HadronicParameters::Getsi(int Bin) const {
   int Sign = Bin > 0 ? +1 : -1;
-  return Sign*m_si[TMath::Abs(Bin)];
+  return Sign*(m_si[TMath::Abs(Bin)] + m_siSmearing[TMath::Abs(Bin)]);
 }
 
 double HadronicParameters::GetKi(int Bin) const {
-  return m_Ki[Bin];
+  return m_Ki[Bin] + m_KiSmearing[Bin];
 }
 
 double HadronicParameters::GetKiError(int Bin) const {
@@ -70,20 +71,20 @@ double HadronicParameters::CalculateYield(int Bin, double rDcosDelta, double rDs
     throw std::invalid_argument("Invalid K0 mode");
   }
   int CP = m_K0Mode == "KS" ? +1 : -1;
-  return m_Ki[Bin] + (rDcosDelta*rDcosDelta + rDsinDelta*rDsinDelta)*m_Ki[-Bin] - 2*CP*TMath::Sqrt(m_Ki[Bin]*m_Ki[-Bin])*(Getci(Bin)*rDcosDelta - Getsi(Bin)*rDsinDelta);
+  return GetKi(Bin) + (rDcosDelta*rDcosDelta + rDsinDelta*rDsinDelta)*GetKi(-Bin) - 2*CP*TMath::Sqrt(GetKi(Bin)*GetKi(-Bin))*(Getci(Bin)*rDcosDelta - Getsi(Bin)*rDsinDelta);
 }
 
 double HadronicParameters::CalculateYieldKiError(int Bin, double rDcosDelta, double rDsinDelta) const {
   int CP = m_K0Mode == "KS" ? +1 : -1;
-  double KiDerivative = 1 - CP*TMath::Sqrt(m_Ki[-Bin]/m_Ki[Bin])*(Getci(Bin)*rDcosDelta - Getsi(Bin)*rDsinDelta);
-  double KbariDerivative = (rDcosDelta*rDcosDelta + rDsinDelta*rDsinDelta) - CP*TMath::Sqrt(m_Ki[Bin]/m_Ki[-Bin])*(Getci(Bin)*rDcosDelta - Getsi(Bin)*rDsinDelta);
+  double KiDerivative = 1 - CP*TMath::Sqrt(GetKi(-Bin)/GetKi(Bin))*(Getci(Bin)*rDcosDelta - Getsi(Bin)*rDsinDelta);
+  double KbariDerivative = (rDcosDelta*rDcosDelta + rDsinDelta*rDsinDelta) - CP*TMath::Sqrt(GetKi(Bin)/GetKi(-Bin))*(Getci(Bin)*rDcosDelta - Getsi(Bin)*rDsinDelta);
   return TMath::Sqrt(TMath::Power(KiDerivative*m_KiError[Bin], 2) + TMath::Power(KbariDerivative*m_KiError[-Bin], 2));
 }
 
 double HadronicParameters::CalculateYieldcisiError(int Bin, double rDcosDelta, double rDsinDelta) const {
   int CP = m_K0Mode == "KS" ? +1 : -1;
-  double ciDerivative = -CP*2*TMath::Sqrt(m_Ki[Bin]*m_Ki[-Bin])*rDcosDelta;
-  double siDerivative = CP*2*TMath::Sqrt(m_Ki[Bin]*m_Ki[-Bin])*rDsinDelta;
+  double ciDerivative = -CP*2*TMath::Sqrt(GetKi(Bin)*GetKi(-Bin))*rDcosDelta;
+  double siDerivative = CP*2*TMath::Sqrt(GetKi(Bin)*GetKi(-Bin))*rDsinDelta;
   return TMath::Sqrt(TMath::Power(ciDerivative*m_ciError[TMath::Abs(Bin)], 2) + TMath::Power(siDerivative*m_siError[TMath::Abs(Bin)], 2));
 }
 
@@ -106,4 +107,23 @@ void HadronicParameters::PrintHadronicParameters() const {
   for(int i = 1; i <= m_ci.Size(); i++) {
     std::cout << i << " " << Getci(i) << " " << Getsi(i) << " " << GetKi(i) << " " << GetKiError(i) << " " << GetKi(-i) << " " << GetKiError(-i) << "\n";
   }
+}
+
+void HadronicParameters::SmearKi() {
+  for(auto Bin : m_KiSmearing.GetBinNumbers()) {
+    m_KiSmearing[Bin] = gRandom->Gaus(0.0, m_KiError[Bin]);
+  }
+}
+
+void HadronicParameters::Smearcisi(const std::vector<double> &Smearing) {
+  for(int i = 1; i <= m_NBins; i++) {
+    m_ciSmearing[i] = Smearing[i - 1];
+    m_siSmearing[i] = Smearing[i + m_NBins - 1];
+  }
+}
+
+void HadronicParameters::RemoveSmearing() {
+  std::fill(m_KiSmearing.begin(), m_KiSmearing.end(), 0.0);
+  std::fill(m_ciSmearing.begin(), m_ciSmearing.end(), 0.0);
+  std::fill(m_siSmearing.begin(), m_siSmearing.end(), 0.0);
 }
