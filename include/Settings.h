@@ -21,17 +21,22 @@ class KpiSettings {
      * Get options in double format
      * @param Setting Name of the setting
      */
-    double GetDouble(const std::string &Setting);
+    double GetDouble(const std::string &Setting) const;
     /**
      * Get options in int format
      * @param Setting Name of the setting
      */
-    int GetInt(const std::string &Setting);
+    int GetInt(const std::string &Setting) const;
     /**
      * Get options in string format
      * @param Setting Name of the setting
      */
-    std::string GetString(const std::string &Setting);
+    std::string GetString(const std::string &Setting) const;
+    /**
+     * Get options in bool format
+     * @param Setting Name of the setting
+     */
+    bool GetBool(const std::string &Setting) const;
   private:
     /**
      * Private constructor because I only want one copy of this object around

@@ -28,15 +28,15 @@ cisiCovariance::cisiCovariance() {
   m_Smearing.insert({"KLpipi", std::vector<double>(16)});
 }
 
-void cisiCovariance::AddDataset(const std::string &Mode, const std::string &HadronicParameterFilename) {
+void cisiCovariance::AddDataset(int NBins, const std::string &Mode, const std::string &HadronicParameterFilename) {
   m_Modes[Mode] = true;
-  int NBins, Shift;
-  if(Mode == "KSKK" || Mode == "KLKK") {
-    NBins = 2;
-    Shift = Mode == "KSKK" ? 0 : 4;
+  int Shift;
+  if(Mode == "KLKK") {
+    Shift = 4;
+  } else if(Mode == "KLpipi") {
+    Shift = 16;
   } else {
-    NBins = 8;
-    Shift = Mode == "KSpipi" ? 0 : 16;
+    Shift = 0;
   }
   std::string K0hhMode = NBins == 2 ? "K0KK" : "K0pipi";
   std::ifstream Infile(HadronicParameterFilename);

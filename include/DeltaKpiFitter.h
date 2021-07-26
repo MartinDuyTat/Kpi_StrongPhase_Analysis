@@ -14,17 +14,19 @@ class DeltaKpiFitter {
     /**
      * Constructor that sets up the measurements that are fitted
      * @param Filename Filename of text file with paths to different measurements
+     * @param DataSetsToFit A string containing all the K0hh modes that should be added in the fit
      * @param FixNormalization Flag that fixes the normalization if it's true
      * @param ErrorCategory The type of error considered in the fit, "Kpi", "Ki" or "cisi"
      */
-    DeltaKpiFitter(const std::string &Filename, bool FixNormalization = true, const std::string &ErrorCategory = "Kpi");
+    DeltaKpiFitter(const std::string &Filename, const std::string &DataSetsToFit, bool FixNormalization = true, const std::string &ErrorCategory = "Kpi");
     /**
      * Run the fit, run \f$K_i\f$ systematics, run \f$c_i, s_i\f$ systematics and save measurements
      * @param Filename Filename of text file to save results to
+     * @param PlotContourFilename Filename for contours, leave empty to not plot them
      * @param RunKiSystematics Set to true to do a \f$K_i\f$ systematics study
      * @param RuncisiSystematics Set to true to do a \f$c_i, s_i\f$  systematics study
      */
-    void RunFit(const std::string &Filename, bool RunKiSystematics = false, bool RuncisiSystematics = false);
+    void RunFit(const std::string &Filename, const std::string &PlotContourFilename = "None", bool RunKiSystematics = false, bool RuncisiSystematics = false);
   private:
     /**
      * Object containing the measurements

@@ -6,7 +6,7 @@
 #include<iostream>
 #include"DeltaKpiFitter.h"
 
-DeltaKpiFitter::DeltaKpiFitter(const std::string &Filename, bool FixNormalization, const std::string &ErrorCategory): m_Measurements(Chi2DoubleTagYield(FixNormalization, ErrorCategory)) {
+DeltaKpiFitter::DeltaKpiFitter(const std::string &Filename, const std::string &DataSetsToFit, bool FixNormalization, const std::string &ErrorCategory): m_Measurements(Chi2DoubleTagYield(FixNormalization, ErrorCategory)) {
   std::ifstream Infile(Filename);
   std::string line;
   int N = 0;
@@ -18,7 +18,7 @@ DeltaKpiFitter::DeltaKpiFitter(const std::string &Filename, bool FixNormalizatio
     int NBins;
     std::string K0Mode, HParameterFilename, DTYieldFilename;
     ss >> NBins >> K0Mode >> HParameterFilename >> DTYieldFilename;
-    m_Measurements.AddMeasurement(NBins, K0Mode, HParameterFilename, DTYieldFilename);
+    m_Measurements.AddMeasurement(NBins, K0Mode, DataSetsToFit, HParameterFilename, DTYieldFilename);
     N++;
   }
   Infile.close();
@@ -31,21 +31,29 @@ DeltaKpiFitter::DeltaKpiFitter(const std::string &Filename, bool FixNormalizatio
   }
 }
 
-void DeltaKpiFitter::RunFit(const std::string &Filename, bool RunKiSystematics, bool RuncisiSystematics) {
-  m_Measurements.MinimizeChi2();
+void DeltaKpiFitter::RunFit(const std::string &Filename, const std::string &PlotContourFilename, bool RunKiSystematics, bool RuncisiSystematics) {
+  m_Measurements.MinimizeChi2(PlotContourFilename);
   std::ofstream Outfile(Filename);
-  Outfile << m_Measurements.GetChi2PerDegreesOfFreedom() << "\n";
-  Outfile << m_Measurements.GetFittedrDcosDelta() << " " << m_Measurements.GetErrorrDcosDelta() << "\n";
-  Outfile << m_Measurements.GetFittedrDsinDelta() << " " << m_Measurements.GetErrorrDsinDelta() << "\n";
+  Outfile << "Statistical fit\n";
+  Outfile << "Chi2/DOF: " << m_Measurements.GetChi2PerDegreesOfFreedom() << "\n";
+  Outfile << "r_D*cos(delta_D): " << m_Measurements.GetFittedrDcosDelta() << " \u00B1 " << m_Measurements.GetErrorrDcosDelta() << "\n";
+  Outfile << "r_D*sin(delta_D): " << m_Measurements.GetFittedrDsinDelta() << " \u00B1 " << m_Measurements.GetErrorrDsinDelta() << "\n";
+  Outfile << "Correlation: " << m_Measurements.GetCorrelation() << "\n";
   if(RunKiSystematics) {
-    double Ki_rDcosDelta_Bias, Ki_rDsinDelta_Bias, Ki_rDcosDelta_Syst, Ki_rDsinDelta_Syst;
-    m_Measurements.RunSystematics("Ki", Ki_rDcosDelta_Bias, Ki_rDsinDelta_Bias, Ki_rDcosDelta_Syst, Ki_rDsinDelta_Syst);
-    Outfile << Ki_rDcosDelta_Bias << " " << Ki_rDsinDelta_Bias << " " << Ki_rDcosDelta_Syst << " " << Ki_rDsinDelta_Syst << "\n";
+    double Ki_rDcosDelta_Bias, Ki_rDsinDelta_Bias, Ki_rDcosDelta_Syst, Ki_rDsinDelta_Syst, Ki_Correlation;
+    m_Measurements.RunSystematics("Ki", Ki_rDcosDelta_Bias, Ki_rDsinDelta_Bias, Ki_rDcosDelta_Syst, Ki_rDsinDelta_Syst, Ki_Correlation);
+    Outfile << "Ki systematics\n";
+    Outfile << "r_D*cos(delta_D): " << Ki_rDcosDelta_Bias << " \u00B1 " << Ki_rDcosDelta_Syst << "\n";
+    Outfile << "r_D*sin(delta_D): " << Ki_rDsinDelta_Bias << " \u00B1 " << Ki_rDsinDelta_Syst << "\n";
+    Outfile << "Correlation: " << Ki_Correlation << "\n";
   }
   if(RuncisiSystematics) {
-    double cisi_rDcosDelta_Bias, cisi_rDsinDelta_Bias, cisi_rDcosDelta_Syst, cisi_rDsinDelta_Syst;
-    m_Measurements.RunSystematics("cisi", cisi_rDcosDelta_Bias, cisi_rDsinDelta_Bias, cisi_rDcosDelta_Syst, cisi_rDsinDelta_Syst);
-    Outfile << cisi_rDcosDelta_Bias << " " << cisi_rDsinDelta_Bias << " " << cisi_rDcosDelta_Syst << " " << cisi_rDsinDelta_Syst << "\n";
+    double cisi_rDcosDelta_Bias, cisi_rDsinDelta_Bias, cisi_rDcosDelta_Syst, cisi_rDsinDelta_Syst, cisi_Correlation;
+    Outfile << "cisi systematics\n";
+    m_Measurements.RunSystematics("cisi", cisi_rDcosDelta_Bias, cisi_rDsinDelta_Bias, cisi_rDcosDelta_Syst, cisi_rDsinDelta_Syst, cisi_Correlation);
+    Outfile << cisi_rDcosDelta_Bias << " \u00B1 " << cisi_rDcosDelta_Syst << "\n";
+    Outfile << cisi_rDsinDelta_Bias << " \u00B1 " << cisi_rDsinDelta_Syst << "\n";
+    Outfile << "Correlation: " << cisi_Correlation << "\n";
   }
   Outfile.close();
 }

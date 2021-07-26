@@ -23,11 +23,12 @@ class Chi2DoubleTagYield {
     /**
      * Function for adding a measurement
      * @param NBins Number of bins
-     * @param K0Mode "KS" or "KL"
+     * @param K0Mode "KSKK", "KLKK", "KSpipi", or "KLpipi"
+     * @param DataSetsToFit String containing (any) K0Mode that should be included in the fit
      * @param HParameterFilename File with hadronic parameters
      * @param DTYieldFilename File with double tag yields
      */
-    void AddMeasurement(int NBins, const std::string &K0Mode, const std::string &HParameterFilename, const std::string &DTYieldFilename);
+    void AddMeasurement(int NBins, const std::string &K0Mode, const std::string &DataSetsToFit, const std::string &HParameterFilename, const std::string &DTYieldFilename);
     /**
      * () operator overload to easily get the total \f$\chi^2\f$
      */
@@ -35,7 +36,7 @@ class Chi2DoubleTagYield {
     /**
      * Run Minuit to minimize the \f$\chi^2\f$
      */
-    void MinimizeChi2();
+    void MinimizeChi2(const std::string &PlotContourFilename = "None");
     /**
      * Function that plots the 1, 2, 3 sigma contours of the results
      */
@@ -57,6 +58,10 @@ class Chi2DoubleTagYield {
      */
     double GetErrorrDsinDelta() const;
     /**
+     * Get the correlation coefficient between \f$r_D\cos(\delta)\f$ and \f$r_D\sin(\delta)\f$
+     */
+    double GetCorrelation() const;
+    /**
      * Get the $\chi^2\f$ per degrees of freedom
      */
     double GetChi2PerDegreesOfFreedom() const;
@@ -71,8 +76,9 @@ class Chi2DoubleTagYield {
      * @param rDsinDelta_Bias The bias in \f$r_D\sin(\delta)\f$ under smearing
      * @param rDcosDelta_Syst The systematic uncertainty in \f$r_D\cos(\delta)\f$ under smearing
      * @param rDsinDelta_Syst The systematic uncertainty in \f$r_D\sin(\delta)\f$ under smearing
+     * @param Correlation The systematic correlation between \f$r_D\cos(\delta)\f$ and \f$r_D\sin(\delta)\f$
      */
-    void RunSystematics(const std::string &Systematics, double &rDcosDelta_Bias, double &rDsinDelta_Bias, double &rDcosDelta_Syst, double &rDsinDelta_Syst);
+    void RunSystematics(const std::string &Systematics, double &rDcosDelta_Bias, double &rDsinDelta_Bias, double &rDcosDelta_Syst, double &rDsinDelta_Syst, double &Correlation);
   private:
     /**
      * Flag that is true when the normalization is fixed to 1
@@ -103,6 +109,10 @@ class Chi2DoubleTagYield {
      */
     double m_ErrorrDsinDelta;
     /**
+     * The correlation coefficient between \f$r_D\cos(\delta)\f$ and \f$r_D\sin(\delta)\f$
+     */
+    double m_Correlation;
+    /**
      * \f$\chi^2\f$ per degree of freedom of fit
      */
     double m_Chi2;
@@ -113,7 +123,7 @@ class Chi2DoubleTagYield {
     /**
      * Helper function that sets up Minuit2 and runs the minimization
      */
-    ROOT::Minuit2::Minuit2Minimizer* RunMinimization(double &rDcosDelta, double &rDsinDelta, double &rDcosDeltaError, double &rDsinDeltaError, double &Chi2) const;
+    ROOT::Minuit2::Minuit2Minimizer* RunMinimization(double &rDcosDelta, double &rDsinDelta, double &rDcosDeltaError, double &rDsinDeltaError, double &Chi2, double &Correlation) const;
 };
 
 #endif

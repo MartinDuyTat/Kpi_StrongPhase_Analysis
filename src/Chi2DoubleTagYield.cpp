@@ -5,6 +5,7 @@
 #include<iostream>
 #include<stdexcept>
 #include<iostream>
+#include<numeric>
 #include"Chi2DoubleTagYield.h"
 #include"DoubleTagMeasurement.h"
 #include"TMath.h"
@@ -16,9 +17,11 @@
 Chi2DoubleTagYield::Chi2DoubleTagYield(bool FixNormalization, const std::string &ErrorCategory): m_FixNormalization(FixNormalization), m_ErrorCategory(ErrorCategory) {
 }
 
-void Chi2DoubleTagYield::AddMeasurement(int NBins, const std::string &K0Mode, const std::string &HParameterFilename, const std::string &DTYieldFilename) {
-  m_Measurements.push_back(DoubleTagMeasurement(NBins, K0Mode, HParameterFilename, DTYieldFilename));
-  m_cisiCovariance.AddDataset(m_Measurements.back().Mode(), HParameterFilename);
+void Chi2DoubleTagYield::AddMeasurement(int NBins, const std::string &K0Mode, const std::string &DataSetsToFit, const std::string &HParameterFilename, const std::string &DTYieldFilename) {
+  if(DataSetsToFit.find(K0Mode) != std::string::npos) {
+    m_Measurements.push_back(DoubleTagMeasurement(NBins, K0Mode, HParameterFilename, DTYieldFilename));
+  }
+  m_cisiCovariance.AddDataset(NBins, K0Mode, HParameterFilename);
 }
 
 double Chi2DoubleTagYield::operator()(const double *params) {
@@ -35,7 +38,7 @@ double Chi2DoubleTagYield::operator()(const double *params) {
   return Chi2;
 }
 
-ROOT::Minuit2::Minuit2Minimizer* Chi2DoubleTagYield::RunMinimization(double &rDcosDelta, double &rDsinDelta, double &rDcosDeltaError, double &rDsinDeltaError, double &Chi2) const {
+ROOT::Minuit2::Minuit2Minimizer* Chi2DoubleTagYield::RunMinimization(double &rDcosDelta, double &rDsinDelta, double &rDcosDeltaError, double &rDsinDeltaError, double &Chi2, double &Correlation) const {
   ROOT::Minuit2::Minuit2Minimizer *Minimizer = new ROOT::Minuit2::Minuit2Minimizer;
   ROOT::Math::Functor fcn(*this, 2 + m_Measurements.size());
   Minimizer->SetFunction(fcn);
@@ -53,6 +56,7 @@ ROOT::Minuit2::Minuit2Minimizer* Chi2DoubleTagYield::RunMinimization(double &rDc
   Minimizer->Minimize();
   const double *Results = Minimizer->X();
   const double *Errors = Minimizer->Errors();
+  Correlation = Minimizer->Correlation(0, 1);
   rDcosDelta = Results[0];
   rDsinDelta = Results[1];
   rDcosDeltaError = Errors[0];
@@ -61,16 +65,10 @@ ROOT::Minuit2::Minuit2Minimizer* Chi2DoubleTagYield::RunMinimization(double &rDc
   return Minimizer;
 }
 
-void Chi2DoubleTagYield::MinimizeChi2() {
-  ROOT::Minuit2::Minuit2Minimizer *Minimizer = RunMinimization(m_FittedrDcosDelta, m_FittedrDsinDelta, m_ErrorrDcosDelta, m_ErrorrDsinDelta, m_Chi2);
-  std::cout << "Plot contours? ";
-  std::string Answer;
-  std::cin >> Answer;
-  if(Answer == "yes") {
-    std::cout << "Filename: ";
-    std::string Filename;
-    std::cin >> Filename;
-    DrawContours(Minimizer, Filename);
+void Chi2DoubleTagYield::MinimizeChi2(const std::string &PlotContourFilename) {
+  ROOT::Minuit2::Minuit2Minimizer *Minimizer = RunMinimization(m_FittedrDcosDelta, m_FittedrDsinDelta, m_ErrorrDcosDelta, m_ErrorrDsinDelta, m_Chi2, m_Correlation);
+  if(PlotContourFilename != "None") {
+    DrawContours(Minimizer, PlotContourFilename);
   }
   delete Minimizer;
 }
@@ -101,7 +99,7 @@ void Chi2DoubleTagYield::DrawContours(ROOT::Minuit2::Minuit2Minimizer *Minimizer
   c.SaveAs(Filename.c_str());
 }
 
-void Chi2DoubleTagYield::RunSystematics(const std::string &Systematics, double &rDcosDelta_Bias, double &rDsinDelta_Bias, double &rDcosDelta_Syst, double &rDsinDelta_Syst) {
+void Chi2DoubleTagYield::RunSystematics(const std::string &Systematics, double &rDcosDelta_Bias, double &rDsinDelta_Bias, double &rDcosDelta_Syst, double &rDsinDelta_Syst, double &Correlation) {
   int NFits = 100000;
   if(Systematics != "Ki" && Systematics != "cisi") {
     throw std::invalid_argument("Unknown systematics");
@@ -109,7 +107,7 @@ void Chi2DoubleTagYield::RunSystematics(const std::string &Systematics, double &
   if(Systematics != "Ki") {
     m_cisiCovariance.PrepareCholesky();
   }
-  std::cout << "Running many fits for systematics\n";
+  std::cout << "Running many fits for " << Systematics << " systematics\n";
   std::vector<double> rDcosDeltaFit(NFits), rDsinDeltaFit(NFits);
   for(int i = 0; i < NFits; i++) {
     if(i%(NFits/10) == 0) {
@@ -127,7 +125,7 @@ void Chi2DoubleTagYield::RunSystematics(const std::string &Systematics, double &
       }
     }
     double dummy;
-    RunMinimization(rDcosDeltaFit[i], rDsinDeltaFit[i], dummy, dummy, dummy);
+    RunMinimization(rDcosDeltaFit[i], rDsinDeltaFit[i], dummy, dummy, dummy, dummy);
   }
   for(auto& Measurement : m_Measurements) {
     Measurement.RemoveSmearing();
@@ -136,6 +134,9 @@ void Chi2DoubleTagYield::RunSystematics(const std::string &Systematics, double &
   rDsinDelta_Bias = TMath::Mean(rDsinDeltaFit.begin(), rDsinDeltaFit.end());
   rDcosDelta_Syst = TMath::RMS(rDcosDeltaFit.begin(), rDcosDeltaFit.end());
   rDsinDelta_Syst = TMath::RMS(rDsinDeltaFit.begin(), rDsinDeltaFit.end());
+  std::transform(rDcosDeltaFit.begin(), rDcosDeltaFit.end(), rDcosDeltaFit.begin(), [&rDcosDelta_Bias] (double a) { return a - rDcosDelta_Bias; });
+  std::transform(rDsinDeltaFit.begin(), rDsinDeltaFit.end(), rDsinDeltaFit.begin(), [&rDsinDelta_Bias] (double a) { return a - rDsinDelta_Bias; });
+  Correlation = std::inner_product(rDcosDeltaFit.begin(), rDcosDeltaFit.end(), rDsinDeltaFit.begin(), 0.0)/((NFits - 1)*rDcosDelta_Syst*rDsinDelta_Syst);
 }
 
 double Chi2DoubleTagYield::GetFittedrDcosDelta() const {
@@ -167,4 +168,8 @@ int Chi2DoubleTagYield::GetDegreesOfFreedom() const {
     DOF -= m_Measurements.size();
   }
   return DOF - 2;
+}
+
+double Chi2DoubleTagYield::GetCorrelation() const {
+  return m_Correlation;
 }

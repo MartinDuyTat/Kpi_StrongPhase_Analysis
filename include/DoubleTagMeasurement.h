@@ -16,7 +16,7 @@ class DoubleTagMeasurement {
     /**
      * Constructor that reads in all the measurements from text files
      * @param NBins Number of bins in binning scheme
-     * @param K0Mode "KS" or "KL"
+     * @param K0Mode "KSKK", "KLKK", "KSpipi" or "KLpipi"
      * @param HadronicParametersFilename Text file with measured hadronic parameters
      * @param DTYieldsFilename Text file with measured double tag yields
      */
