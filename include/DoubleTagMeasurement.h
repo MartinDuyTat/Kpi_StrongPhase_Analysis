@@ -8,6 +8,7 @@
 
 #include<string>
 #include<vector>
+#include<utility>
 #include"HadronicParameters.h"
 #include"DoubleTagYields.h"
 
@@ -23,8 +24,13 @@ class DoubleTagMeasurement {
     DoubleTagMeasurement(int NBins, const std::string &K0Mode, const std::string &HadronicParametersFilename, const std::string &DTYieldsFilename);
     /**
      * Function for obtaining the \f$\chi^2\f$ of the double tag yield, compared with the prediction from hadronic parameters
+     * @param Normalization The normalization constant that the yield is multiplied with, set to 1 if yields are normalized
+     * @param rDcosDelta \f$r_D\cos(\delta_D)\f$
+     * @param rDsinDelta \f$r_D\sin(\delta_D)\f$
+     * @param ErrorCategory "Kpi" is statistical, "Ki" and "cisi" are obsolete because of smearing
+     * @param VetoBins Vector of pairs, the first component being the K0 mode and the other being the bin that is left out from the fit
      */
-    double GetChi2(double Normalization, double rDcosDelta, double rDsinDelta, const std::string &ErrorCategory);
+    double GetChi2(double Normalization, double rDcosDelta, double rDsinDelta, const std::string &ErrorCategory = "Kpi", const std::vector<std::pair<std::string, int>> &VetoBins = std::vector<std::pair<std::string, int>>());
     /**
      * Get the number of bins
      */

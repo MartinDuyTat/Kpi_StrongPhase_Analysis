@@ -13,12 +13,15 @@ DoubleTagMeasurement::DoubleTagMeasurement(int NBins, const std::string &K0Mode,
   m_DTYields.PrintYields();
 }
 
-double DoubleTagMeasurement::GetChi2(double Normalization, double rDcosDelta, double rDsinDelta, const std::string &ErrorCategory) {
+double DoubleTagMeasurement::GetChi2(double Normalization, double rDcosDelta, double rDsinDelta, const std::string &ErrorCategory, const std::vector<std::pair<std::string, int>> &VetoBins) {
   BinVector<double> YieldPredictions, YieldKiErrorPredictions, YieldcisiErrorPredictions;
   m_HParameters.CalculateNormalizedYields(Normalization, rDcosDelta, rDsinDelta, YieldPredictions, YieldKiErrorPredictions, YieldcisiErrorPredictions);
   double Chi2 = 0.0;
   for(int Bin = -m_NBins; Bin <= m_NBins; Bin++ ) {
     if(Bin == 0) {
+      continue;
+    }
+    if(VetoBins.size() != 0 && std::find(VetoBins.begin(), VetoBins.end(), std::pair<std::string, int>({m_Mode, Bin})) != VetoBins.end()) {
       continue;
     }
     double ErrorSquared = 0.0;

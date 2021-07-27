@@ -15,7 +15,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   KpiSettings::Get().Initialize(std::string(argv[1]));
-  DeltaKpiFitter Fitter(KpiSettings::Get().GetString("Datasets"), KpiSettings::Get().GetString("DataSetsToFit"), KpiSettings::Get().GetBool("FixNormalization"), KpiSettings::Get().GetString("ErrorCategory"));
+  DeltaKpiFitter Fitter(KpiSettings::Get().GetString("Datasets"), KpiSettings::Get().GetString("DataSetsToFit"), KpiSettings::Get().GetBool("FixNormalization"), KpiSettings::Get().GetString("ErrorCategory"), KpiSettings::Get().GetString("VetoBinsFile"));
   Fitter.RunFit(KpiSettings::Get().GetString("ResultsFile"), KpiSettings::Get().GetString("PlotContourFilename"), KpiSettings::Get().GetBool("RunKiSystematics"), KpiSettings::Get().GetBool("RuncisiSystematics"));
   return 0;
 }

@@ -5,6 +5,7 @@
 
 #include<vector>
 #include<string>
+#include<utility>
 #include"DoubleTagMeasurement.h"
 #include"cisiCovariance.h"
 #include"Minuit2/Minuit2Minimizer.h"
@@ -19,7 +20,7 @@ class Chi2DoubleTagYield {
      * @param FixNormalization True if normalization is fixed to 1
      * @param ErrorCategory The type of error considered in the fit, "Kpi", "Ki" or "cisi"
      */
-    Chi2DoubleTagYield(bool FixNormalization, const std::string &ErrorCategory);
+    Chi2DoubleTagYield(bool FixNormalization, const std::string &ErrorCategory = "Kpi");
     /**
      * Function for adding a measurement
      * @param NBins Number of bins
@@ -79,6 +80,10 @@ class Chi2DoubleTagYield {
      * @param Correlation The systematic correlation between \f$r_D\cos(\delta)\f$ and \f$r_D\sin(\delta)\f$
      */
     void RunSystematics(const std::string &Systematics, double &rDcosDelta_Bias, double &rDsinDelta_Bias, double &rDcosDelta_Syst, double &rDsinDelta_Syst, double &Correlation);
+    /**
+     * Setter for m_VetoBins
+     */
+    void SetVetoBins(const std::vector<std::pair<std::string, int>> &VetoBins);
   private:
     /**
      * Flag that is true when the normalization is fixed to 1
@@ -120,6 +125,10 @@ class Chi2DoubleTagYield {
      * Object containing all the covariance matrices for the \f$c_i, s_i\f$
      */
     cisiCovariance m_cisiCovariance;
+    /**
+     * Vector of pairs, the first component being the K0 mode and the other being the bin that is left out from the fit
+     */
+    std::vector<std::pair<std::string, int>> m_VetoBins;
     /**
      * Helper function that sets up Minuit2 and runs the minimization
      */

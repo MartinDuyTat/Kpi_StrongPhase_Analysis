@@ -4,9 +4,28 @@
 #include<string>
 #include<sstream>
 #include<iostream>
+#include<vector>
+#include<utility>
 #include"DeltaKpiFitter.h"
 
-DeltaKpiFitter::DeltaKpiFitter(const std::string &Filename, const std::string &DataSetsToFit, bool FixNormalization, const std::string &ErrorCategory): m_Measurements(Chi2DoubleTagYield(FixNormalization, ErrorCategory)) {
+DeltaKpiFitter::DeltaKpiFitter(const std::string &Filename, const std::string &DataSetsToFit, bool FixNormalization, const std::string &ErrorCategory, const std::string &VetoBinsFilename): m_Measurements(Chi2DoubleTagYield(FixNormalization, ErrorCategory)) {
+  if(VetoBinsFilename != "None") {
+    std::vector<std::pair<std::string, int>> VetoBins;
+    std::ifstream VetoBinsFile(VetoBinsFilename);
+    std::string line;
+    while(std::getline(VetoBinsFile, line)) {
+      if(line[0] == '#') {
+	continue;
+      }
+      std::stringstream ss(line);
+      std::string Mode;
+      int Bin;
+      ss >> Mode >> Bin;
+      VetoBins.push_back(std::pair<std::string, int>({Mode, Bin}));
+    }
+    VetoBinsFile.close();
+    m_Measurements.SetVetoBins(VetoBins);
+  }
   std::ifstream Infile(Filename);
   std::string line;
   int N = 0;

@@ -6,6 +6,7 @@
 #include<stdexcept>
 #include<iostream>
 #include<numeric>
+#include<utility>
 #include"Chi2DoubleTagYield.h"
 #include"DoubleTagMeasurement.h"
 #include"TMath.h"
@@ -33,7 +34,7 @@ double Chi2DoubleTagYield::operator()(const double *params) {
   }
   double Chi2 = 0.0;
   for(unsigned int i = 0; i < m_Measurements.size(); i++) {
-    Chi2 += m_Measurements[i].GetChi2(Normalizations[i], rDcosDelta, rDsinDelta, m_ErrorCategory);
+    Chi2 += m_Measurements[i].GetChi2(Normalizations[i], rDcosDelta, rDsinDelta, m_ErrorCategory, m_VetoBins);
   }
   return Chi2;
 }
@@ -172,4 +173,8 @@ int Chi2DoubleTagYield::GetDegreesOfFreedom() const {
 
 double Chi2DoubleTagYield::GetCorrelation() const {
   return m_Correlation;
+}
+
+void Chi2DoubleTagYield::SetVetoBins(const std::vector<std::pair<std::string, int>> &VetoBins) {
+  m_VetoBins = VetoBins;
 }

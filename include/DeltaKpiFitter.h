@@ -17,8 +17,9 @@ class DeltaKpiFitter {
      * @param DataSetsToFit A string containing all the K0hh modes that should be added in the fit
      * @param FixNormalization Flag that fixes the normalization if it's true
      * @param ErrorCategory The type of error considered in the fit, "Kpi", "Ki" or "cisi"
+     * @param VetoBinsFilename Filename of text file containing modes and bins that are left out of the fit
      */
-    DeltaKpiFitter(const std::string &Filename, const std::string &DataSetsToFit, bool FixNormalization = true, const std::string &ErrorCategory = "Kpi");
+    DeltaKpiFitter(const std::string &Filename, const std::string &DataSetsToFit, bool FixNormalization = true, const std::string &ErrorCategory = "Kpi", const std::string &VetoBinsFilename = "None");
     /**
      * Run the fit, run \f$K_i\f$ systematics, run \f$c_i, s_i\f$ systematics and save measurements
      * @param Filename Filename of text file to save results to
