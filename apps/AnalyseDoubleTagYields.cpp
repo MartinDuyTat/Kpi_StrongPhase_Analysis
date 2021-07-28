@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     return 0;
   }
   KpiSettings::Get().Initialize(std::string(argv[1]));
-  TreeWrapper MCSignalTree(KpiSettings::Get().GetString("SignalMCFiles"), KpiSettings::Get().GetString("TreeName"), KpiSettings::Get().GetString("TruthMatchingCutFile"), "SignalMC");
+  TreeWrapper MCSignalTree(KpiSettings::Get().GetString("SignalMCFiles"), KpiSettings::Get().GetString("TreeName"), KpiSettings::Get().GetString("TruthMatchingCutFile"), "SignalMC", KpiSettings::Get().GetDouble("SignalMCMomentumSmearing"));
   AnalyseBinMigration AnalysisBinMigration(&MCSignalTree);
   AnalysisBinMigration.CalculateBinMigrationYields(KpiSettings::Get().GetString("BinMigrationMatrixFile"));
   AnalyseYield AnalysisSignalMC(&MCSignalTree, false);

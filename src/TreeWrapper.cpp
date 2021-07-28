@@ -6,8 +6,10 @@
 #include"TreeWrapper.h"
 #include"TEntryList.h"
 #include"TCut.h"
+#include"TRandom3.h"
+#include"TMath.h"
 
-TreeWrapper::TreeWrapper(const std::string &Filename, const std::string &TreeName, const std::string &CutFile, const std::string &DataType): m_Chain(TreeName.c_str()) {
+TreeWrapper::TreeWrapper(const std::string &Filename, const std::string &TreeName, const std::string &CutFile, const std::string &DataType, double MomentumSmearing): m_Chain(TreeName.c_str()), m_MomentumSmearing(MomentumSmearing) {
   std::ifstream DataFile(Filename);
   std::string line;
   while(std::getline(DataFile, line)) {
@@ -126,6 +128,9 @@ int TreeWrapper::GetEntries() const {
 
 void TreeWrapper::GetEntry(int i) {
   m_Chain.GetEntry(m_Chain.GetEntryNumber(i));
+  if(m_MomentumSmearing != 0.0) {
+    SmearMomenta();
+  }
 }
 
 std::string TreeWrapper::GetSignalMode() const {
@@ -134,4 +139,24 @@ std::string TreeWrapper::GetSignalMode() const {
 
 std::string TreeWrapper::GetTagMode() const {
   return m_TagMode;
+}
+
+void TreeWrapper::SmearMomenta() {
+  for(int i = 0; i < 3; i++) {
+    double RandomKplus = gRandom->Gaus(0.0, m_MomentumSmearing);
+    double RandomKminus = gRandom->Gaus(0.0, m_MomentumSmearing);
+    double RandomK0 = gRandom->Gaus(0.0, m_MomentumSmearing);
+    m_RecKinematics.KPlus_P[i] += RandomKplus;
+    m_RecKinematics.KPlusKalman_P[i] += RandomKplus;
+    m_RecKinematics.KMinus_P[i] += RandomKminus;
+    m_RecKinematics.KMinusKalman_P[i] += RandomKminus;
+    m_RecKinematics.K0_P[i] += RandomK0;
+    m_RecKinematics.K0Kalman_P[i] += RandomK0;
+  }
+  m_RecKinematics.KPlus_P[3] = TMath::Sqrt(TMath::Power(m_RecKinematics.KPlus_P[0], 2) + TMath::Power(m_RecKinematics.KPlus_P[1], 2) + TMath::Power(m_RecKinematics.KPlus_P[2], 2) + TMath::Power(0.493677, 2));
+  m_RecKinematics.KPlusKalman_P[3] = TMath::Sqrt(TMath::Power(m_RecKinematics.KPlusKalman_P[0], 2) + TMath::Power(m_RecKinematics.KPlusKalman_P[1], 2) + TMath::Power(m_RecKinematics.KPlusKalman_P[2], 2) + TMath::Power(0.493677, 2));
+  m_RecKinematics.KMinus_P[3] = TMath::Sqrt(TMath::Power(m_RecKinematics.KMinus_P[0], 2) + TMath::Power(m_RecKinematics.KMinus_P[1], 2) + TMath::Power(m_RecKinematics.KMinus_P[2], 2) + TMath::Power(0.493677, 2));
+  m_RecKinematics.KMinusKalman_P[3] = TMath::Sqrt(TMath::Power(m_RecKinematics.KMinusKalman_P[0], 2) + TMath::Power(m_RecKinematics.KMinusKalman_P[1], 2) + TMath::Power(m_RecKinematics.KMinusKalman_P[2], 2) + TMath::Power(0.493677, 2));
+  m_RecKinematics.K0_P[3] = TMath::Sqrt(TMath::Power(m_RecKinematics.K0_P[0], 2) + TMath::Power(m_RecKinematics.K0_P[1], 2) + TMath::Power(m_RecKinematics.K0_P[2], 2) + TMath::Power(0.493677, 2));
+  m_RecKinematics.K0Kalman_P[3] = TMath::Sqrt(TMath::Power(m_RecKinematics.K0Kalman_P[0], 2) + TMath::Power(m_RecKinematics.K0Kalman_P[1], 2) + TMath::Power(m_RecKinematics.K0Kalman_P[2], 2) + TMath::Power(0.497611, 2));
 }

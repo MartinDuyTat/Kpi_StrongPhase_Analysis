@@ -112,8 +112,9 @@ class TreeWrapper {
      * @param TreeName Name of ROOT object
      * @param CutFile File containing selection cuts
      * @param DataType "Data", "SignalMC" or "TruthTuple"
+     * @param MomentumSmearing Smear the K0KK momenta by this amount
      */
-    TreeWrapper(const std::string &Filename, const std::string &TreeName, const std::string &CutFile, const std::string &DataType);
+    TreeWrapper(const std::string &Filename, const std::string &TreeName, const std::string &CutFile, const std::string &DataType, double MomentumSmearing = 0.0);
     /**
      * Function that sets all the branch addresses
      * @param DataType "Data", "SignalMC" or "TruthTuple"
@@ -144,6 +145,10 @@ class TreeWrapper {
      * Get tag mode
      */
     std::string GetTagMode() const;
+    /**
+     * Smear the K0KK momenta
+     */
+    void SmearMomenta();
   private:
     /**
      * TChain object containing all data
@@ -169,6 +174,10 @@ class TreeWrapper {
      * Struct with generator kinematics
      */
     GeneratorKinematics m_GenKinematics;
+    /**
+     * Smear the K0KK momenta by a random Gaussian with this standard deviation, set to zero for no smearing
+     */
+    double m_MomentumSmearing;
 };
 
 #endif
