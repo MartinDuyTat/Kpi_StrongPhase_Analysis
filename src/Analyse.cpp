@@ -89,13 +89,7 @@ int Analyse::DetermineReconstructedBinNumber() const {
   }
   int KCharge = RecKinematics.TagKCharge;
   int BinNumber = m_BinningScheme.GetBinNumber(M2Plus, M2Minus, KCharge);
-  if(BinNumber == 0) {
-    M2Plus = (RecKinematics.K0_P + RecKinematics.KPlus_P).M2();
-    M2Minus = (RecKinematics.K0_P + RecKinematics.KMinus_P).M2();
-    return m_BinningScheme.GetBinNumber(M2Plus, M2Minus, KCharge);
-  } else {
-    return BinNumber;
-  }
+  return BinNumber;
 }
 
 int Analyse::DetermineMappedReconstructedBinNumber() const {
