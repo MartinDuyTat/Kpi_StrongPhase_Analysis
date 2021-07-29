@@ -26,10 +26,11 @@ class Chi2DoubleTagYield {
      * @param NBins Number of bins
      * @param K0Mode "KSKK", "KLKK", "KSpipi", or "KLpipi"
      * @param DataSetsToFit String containing (any) K0Mode that should be included in the fit
-     * @param HParameterFilename File with hadronic parameters
+     * @param cisiHParameterFilename File with strong phase \f$c_i, s_i\f$ parameters
+     * @param KiHParameterFilename File with hadronic \f$K_i\f$ parameters
      * @param DTYieldFilename File with double tag yields
      */
-    void AddMeasurement(int NBins, const std::string &K0Mode, const std::string &DataSetsToFit, const std::string &HParameterFilename, const std::string &DTYieldFilename);
+    void AddMeasurement(int NBins, const std::string &K0Mode, const std::string &DataSetsToFit, const std::string &cisiHParameterFilename, const std::string &KiHParameterFilename, const std::string &DTYieldFilename);
     /**
      * () operator overload to easily get the total \f$\chi^2\f$
      */

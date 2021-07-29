@@ -11,24 +11,32 @@
 HadronicParameters::HadronicParameters(): m_NBins(0) {
 }
 
-HadronicParameters::HadronicParameters(const std::string &Filename, int NBins, const std::string &K0Mode): m_NBins(NBins), m_K0Mode(K0Mode.substr(0, 2)), m_Ki(BinVector<double>(true, m_NBins)), m_KiError(BinVector<double>(true, m_NBins)), m_ci(BinVector<double>(false, m_NBins)), m_ciError(BinVector<double>(false, m_NBins)), m_si(BinVector<double>(false, m_NBins)), m_siError(BinVector<double>(false, m_NBins)), m_KiSmearing(BinVector<double>(true, m_NBins)), m_ciSmearing(BinVector<double>(false, m_NBins)), m_siSmearing(BinVector<double>(false, m_NBins)), m_Covariance_Cholesky(TMatrixT<double>(2*m_NBins, 2*m_NBins)) {
-  std::ifstream Infile(Filename);
+HadronicParameters::HadronicParameters(const std::string &cisiFilename, const std::string &KiFilename, int NBins, const std::string &K0Mode): m_NBins(NBins), m_K0Mode(K0Mode.substr(0, 2)), m_Ki(BinVector<double>(true, m_NBins)), m_KiError(BinVector<double>(true, m_NBins)), m_ci(BinVector<double>(false, m_NBins)), m_ciError(BinVector<double>(false, m_NBins)), m_si(BinVector<double>(false, m_NBins)), m_siError(BinVector<double>(false, m_NBins)), m_KiSmearing(BinVector<double>(true, m_NBins)), m_ciSmearing(BinVector<double>(false, m_NBins)), m_siSmearing(BinVector<double>(false, m_NBins)), m_Covariance_Cholesky(TMatrixT<double>(2*m_NBins, 2*m_NBins)) {
+  std::ifstream cisiInfile(cisiFilename);
   std::string line;
   for(int i = 1; i <= m_NBins; i++) {
-    std::getline(Infile, line);
+    std::getline(cisiInfile, line);
     std::stringstream ss(line);
-    double ci, ciErrorStat, ciErrorSyst, si, siErrorStat, siErrorSyst, Ki, KiError, Kbari, KbariError, dummy;
-    ss >> dummy >> ci >> ciErrorStat >> ciErrorSyst >> si >> siErrorStat >> siErrorSyst >> Ki >> KiError >> Kbari >> KbariError;
+    double ci, ciErrorStat, ciErrorSyst, si, siErrorStat, siErrorSyst, dummy;
+    ss >> dummy >> ci >> ciErrorStat >> ciErrorSyst >> si >> siErrorStat >> siErrorSyst;
     m_ci[i] = ci;
     m_ciError[i] = TMath::Sqrt(ciErrorStat*ciErrorStat + ciErrorSyst*ciErrorSyst);
     m_si[i] = si;
     m_siError[i] = TMath::Sqrt(siErrorStat*siErrorStat + siErrorSyst*siErrorSyst);
+  }
+  cisiInfile.close();
+  std::ifstream KiInfile(KiFilename);
+  for(int i = 1; i <= m_NBins; i++) {
+    std::getline(KiInfile, line);
+    std::stringstream ss(line);
+    double Ki, KiError, Kbari, KbariError, dummy;
+    ss >> dummy >> Ki >> KiError >> Kbari >> KbariError;
     m_Ki[i] = Ki;
     m_Ki[-i] = Kbari;
     m_KiError[i] = KiError;
     m_KiError[-i] = KbariError;
   }
-  Infile.close();
+  KiInfile.close();
 }
 
 std::string HadronicParameters::CreateYieldFormula(int Bin) const {

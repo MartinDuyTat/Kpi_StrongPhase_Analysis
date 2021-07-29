@@ -35,9 +35,9 @@ DeltaKpiFitter::DeltaKpiFitter(const std::string &Filename, const std::string &D
     }
     std::stringstream ss(line);
     int NBins;
-    std::string K0Mode, HParameterFilename, DTYieldFilename;
-    ss >> NBins >> K0Mode >> HParameterFilename >> DTYieldFilename;
-    m_Measurements.AddMeasurement(NBins, K0Mode, DataSetsToFit, HParameterFilename, DTYieldFilename);
+    std::string K0Mode, cisiHParameterFilename, KiHParameterFilename, DTYieldFilename;
+    ss >> NBins >> K0Mode >> cisiHParameterFilename >> KiHParameterFilename >> DTYieldFilename;
+    m_Measurements.AddMeasurement(NBins, K0Mode, DataSetsToFit, cisiHParameterFilename, KiHParameterFilename, DTYieldFilename);
     N++;
   }
   Infile.close();

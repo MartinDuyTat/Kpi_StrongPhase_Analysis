@@ -11,7 +11,7 @@
 #include"TLatex.h"
 #include"TPad.h"
 
-PresentYields::PresentYields(const std::string &K0pipiKpiYieldFile, const std::string &K0KKKpiYieldFile, const std::string &K0pipiHadronicFile, const std::string &K0KKHadronicFile, const std::string &K0Mode, double rDcosDelta, double rDsinDelta): m_K0pipiBins(8), m_K0KKBins(2), m_K0pipiDoubleTagYield(K0pipiKpiYieldFile, m_K0pipiBins), m_K0KKDoubleTagYield(K0KKKpiYieldFile, m_K0KKBins), m_K0pipiHadronicParameters(K0pipiHadronicFile, m_K0pipiBins, K0Mode), m_K0KKHadronicParameters(K0KKHadronicFile, m_K0KKBins, K0Mode), m_K0Mode(K0Mode), m_rDcosDelta(rDcosDelta), m_rDsinDelta(rDsinDelta) {
+PresentYields::PresentYields(const std::string &K0pipiKpiYieldFile, const std::string &K0KKKpiYieldFile, const std::string &K0pipicisiHadronicFile, const std::string &K0pipiKiHadronicFile, const std::string &K0KKcisiHadronicFile, const std::string &K0KKKiHadronicFile, const std::string &K0Mode, double rDcosDelta, double rDsinDelta): m_K0pipiBins(8), m_K0KKBins(2), m_K0pipiDoubleTagYield(K0pipiKpiYieldFile, m_K0pipiBins), m_K0KKDoubleTagYield(K0KKKpiYieldFile, m_K0KKBins), m_K0pipiHadronicParameters(K0pipicisiHadronicFile, K0pipiKiHadronicFile, m_K0pipiBins, K0Mode), m_K0KKHadronicParameters(K0KKcisiHadronicFile, K0KKKiHadronicFile, m_K0KKBins, K0Mode), m_K0Mode(K0Mode), m_rDcosDelta(rDcosDelta), m_rDsinDelta(rDsinDelta) {
 }
 
 void PresentYields::PlotYieldPresentation(const std::string &Filename) const {

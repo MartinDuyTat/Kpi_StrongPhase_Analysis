@@ -25,8 +25,8 @@ YieldCombiner::YieldCombiner(int Bins, const std::vector<std::string> &Files): m
 
 void YieldCombiner::SaveYields(const std::string &Filename) const {
   std::ofstream Outfile(Filename);
-  for(auto Bin : m_Yield.GetBinNumbers()) {
-    Outfile << Bin << " " << m_Yield[Bin] << " " << m_YieldError[Bin] << "\n";
+  for(int Bin = 1; Bin <= m_Yield.Size(); Bin++) {
+    Outfile << Bin << " " << m_Yield[Bin] << " " << m_YieldError[Bin] << " " << m_Yield[-Bin] << " " << m_YieldError[-Bin] << "\n";
   }
   Outfile.close();
 }

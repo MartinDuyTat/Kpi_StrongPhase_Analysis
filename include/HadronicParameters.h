@@ -20,11 +20,12 @@ class HadronicParameters {
     HadronicParameters();
     /**
      * Constructor that reads the hadronic parameters from a file
-     * @param Filename Name of file with hadronic parameters
+     * @param cisiFilename Name of file with strong phase \f$c_i, s_i\f$ parameters
+     * @param KiFilename Name of file with hadronic \f$K_i\f$ parameters
      * @param NBins Number of bins (not counting negative bins)
      * @param K0Mode "KS" for \f$K_S^0\f$ and "KL" for \f$K_L\f$
      */
-    HadronicParameters(const std::string &Filename, int NBins, const std::string &K0Mode);
+    HadronicParameters(const std::string &cisiFilename, const std::string &KiFilename, int NBins, const std::string &K0Mode);
     /**
      * Function that creates a formula string for the predicted number of events in each bin
      * The order is: Normalization H, rD, cos(delta) and sin(delta)

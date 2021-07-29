@@ -18,10 +18,11 @@ class DoubleTagMeasurement {
      * Constructor that reads in all the measurements from text files
      * @param NBins Number of bins in binning scheme
      * @param K0Mode "KSKK", "KLKK", "KSpipi" or "KLpipi"
-     * @param HadronicParametersFilename Text file with measured hadronic parameters
+     * @param cisiHadronicParametersFilename Text file with measured strong phase \f$c_i, s_i\f$ parameters
+     * @param KiHadronicParametersFilename Text file with measured hadronic \f$K_i\f$ parameters
      * @param DTYieldsFilename Text file with measured double tag yields
      */
-    DoubleTagMeasurement(int NBins, const std::string &K0Mode, const std::string &HadronicParametersFilename, const std::string &DTYieldsFilename);
+    DoubleTagMeasurement(int NBins, const std::string &K0Mode, const std::string &cisiHadronicParametersFilename, const std::string &KiHadronicParametersFilename, const std::string &DTYieldsFilename);
     /**
      * Function for obtaining the \f$\chi^2\f$ of the double tag yield, compared with the prediction from hadronic parameters
      * @param Normalization The normalization constant that the yield is multiplied with, set to 1 if yields are normalized

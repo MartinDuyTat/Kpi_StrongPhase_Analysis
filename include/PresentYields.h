@@ -16,13 +16,15 @@ class PresentYields {
      * Constructor that stores all the relevant data
      * @param K0pipiKpiYieldFile File with K0pipi vs Kpi yields
      * @param K0KKKpiYieldFile File with K0KK vs Kpi yields
-     * @param K0pipiHadronicFile File with K0pipi hadronic parameters
-     * @param K0KKHadronicFile File with K0KK hadronic parameters
+     * @param K0pipicisiHadronicFile File with K0pipi strong phase \f$c_i, s_i\f$ parameters
+     * @param K0pipicisiHadronicFile File with K0pipi hadronic \f$K_i\f$ parameters
+     * @param K0KKHadronicFile File with K0KK strong phase \f$c_i, s_i\f$ parameters
+     * @param K0KKHadronicFile File with K0KK hadronic \f$K_i\f$ parameters
      * @param K0Mode "KS" or "KL"
      * @param rDcosDelta Assumed value of \f$r_D^{K\pi}\cos(\delta_D^{K\pi})\f$
      * @param rDsinDelta Assumed value of \f$r_D^{K\pi}\sin(\delta_D^{K\pi})\f$
      */
-    PresentYields(const std::string &K0pipiKpiYieldFile, const std::string &K0KKKpiYieldFile, const std::string &K0pipiHadronicFile, const std::string &K0KKHadronicFile, const std::string &K0Mode, double rDcosDelta, double rDsinDelta);
+    PresentYields(const std::string &K0pipiKpiYieldFile, const std::string &K0KKKpiYieldFile, const std::string &K0pipicisiHadronicFile, const std::string &K0pipiKiHadronicFile, const std::string &K0KKcisiHadronicFile, const std::string &K0KKKiHadronicFile, const std::string &K0Mode, double rDcosDelta, double rDsinDelta);
     /**
      * Function that plots the Kpi yield and the prediction
      * @param Filename Filename to save plot to

@@ -22,7 +22,7 @@ class cisiCovariance {
      * Read the uncertainties and correlation matrices from a file
      * It is assumed that the correlation matrix is read from the file with the KShh mode, only uncertainties are read from the KLhh file
      */
-    void AddDataset(int NBins, const std::string &Mode, const std::string &HadronicParameterFilename);
+    void AddDataset(int NBins, const std::string &Mode, const std::string &cisiHadronicParameterFilename);
     /**
      * Once all the correlation matrices have been read from file, this function will perform the Cholesky decomposition
      * If not all the tag modes have been read from file yet, an exception is thrown

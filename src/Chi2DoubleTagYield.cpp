@@ -18,11 +18,11 @@
 Chi2DoubleTagYield::Chi2DoubleTagYield(bool FixNormalization, const std::string &ErrorCategory): m_FixNormalization(FixNormalization), m_ErrorCategory(ErrorCategory) {
 }
 
-void Chi2DoubleTagYield::AddMeasurement(int NBins, const std::string &K0Mode, const std::string &DataSetsToFit, const std::string &HParameterFilename, const std::string &DTYieldFilename) {
+void Chi2DoubleTagYield::AddMeasurement(int NBins, const std::string &K0Mode, const std::string &DataSetsToFit, const std::string &cisiHParameterFilename, const std::string &KiHParameterFilename, const std::string &DTYieldFilename) {
   if(DataSetsToFit.find(K0Mode) != std::string::npos) {
-    m_Measurements.push_back(DoubleTagMeasurement(NBins, K0Mode, HParameterFilename, DTYieldFilename));
+    m_Measurements.push_back(DoubleTagMeasurement(NBins, K0Mode, cisiHParameterFilename, KiHParameterFilename, DTYieldFilename));
   }
-  m_cisiCovariance.AddDataset(NBins, K0Mode, HParameterFilename);
+  m_cisiCovariance.AddDataset(NBins, K0Mode, cisiHParameterFilename);
 }
 
 double Chi2DoubleTagYield::operator()(const double *params) {

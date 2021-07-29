@@ -6,8 +6,8 @@
 #include"BinVector.h"
 #include"DoubleTagMeasurement.h"
 
-DoubleTagMeasurement::DoubleTagMeasurement(int NBins, const std::string &K0Mode, const std::string &HadronicParametersFilename, const std::string &DTYieldsFilename): m_NBins(NBins), m_HParameters(HadronicParametersFilename, m_NBins, K0Mode), m_DTYields(DTYieldsFilename, m_NBins), m_Mode(K0Mode) {
-  std::cout << "Adding the following hadronic parameters from the file " << HadronicParametersFilename << ":\n";
+DoubleTagMeasurement::DoubleTagMeasurement(int NBins, const std::string &K0Mode, const std::string &cisiHadronicParametersFilename, const std::string &KiHadronicParametersFilename, const std::string &DTYieldsFilename): m_NBins(NBins), m_HParameters(cisiHadronicParametersFilename, KiHadronicParametersFilename, m_NBins, K0Mode), m_DTYields(DTYieldsFilename, m_NBins), m_Mode(K0Mode) {
+  std::cout << "Adding the following strong phase parameters from the file " << cisiHadronicParametersFilename << "and fractional yields from the file " << KiHadronicParametersFilename << ":\n";
   m_HParameters.PrintHadronicParameters();
   std::cout << "Adding the following double tag yields from the file " << DTYieldsFilename << ":\n";
   m_DTYields.PrintYields();

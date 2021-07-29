@@ -28,7 +28,7 @@ cisiCovariance::cisiCovariance() {
   m_Smearing.insert({"KLpipi", std::vector<double>(16)});
 }
 
-void cisiCovariance::AddDataset(int NBins, const std::string &Mode, const std::string &HadronicParameterFilename) {
+void cisiCovariance::AddDataset(int NBins, const std::string &Mode, const std::string &cisiHadronicParameterFilename) {
   m_Modes[Mode] = true;
   int Shift;
   if(Mode == "KLKK") {
@@ -39,7 +39,7 @@ void cisiCovariance::AddDataset(int NBins, const std::string &Mode, const std::s
     Shift = 0;
   }
   std::string K0hhMode = NBins == 2 ? "K0KK" : "K0pipi";
-  std::ifstream Infile(HadronicParameterFilename);
+  std::ifstream Infile(cisiHadronicParameterFilename);
   for(int i = 0; i < NBins; i++) {
     std::string line;
     std::getline(Infile, line);
