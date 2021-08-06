@@ -10,10 +10,12 @@ DoubleTagYields::DoubleTagYields(const std::string &Filename, int NBins): m_Yiel
   while(std::getline(Infile, line)) {
     std::stringstream ss(line);
     int i;
-    double Yield, YieldError;
-    ss >> i >> Yield >> YieldError;
-    m_Yield[i] = Yield;
-    m_YieldError[i] = YieldError;
+    double Yield_Positive, YieldError_Positive, Yield_Negative, YieldError_Negative;
+    ss >> i >> Yield_Positive >> YieldError_Positive >> Yield_Negative >> YieldError_Negative;
+    m_Yield[i] = Yield_Positive;
+    m_YieldError[i] = YieldError_Positive;
+    m_Yield[-i] = Yield_Negative;
+    m_YieldError[-i] = YieldError_Negative;
   }
   Infile.close();
 }

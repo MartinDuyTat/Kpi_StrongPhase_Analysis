@@ -6,7 +6,7 @@
 #include"Analyse.h"
 #include"TreeWrapper.h"
 
-Analyse::Analyse(TreeWrapper *Tree): m_Tree(Tree) {
+Analyse::Analyse(TreeWrapper *Tree, bool SwapBins): m_Tree(Tree), m_SwapBins(SwapBins) {
 }
 
 int Analyse::ArrayIndex(int i) const {
@@ -89,6 +89,9 @@ int Analyse::DetermineReconstructedBinNumber() const {
   }
   int KCharge = RecKinematics.TagKCharge;
   int BinNumber = m_BinningScheme.GetBinNumber(M2Plus, M2Minus, KCharge);
+  if(m_SwapBins) {
+    BinNumber *= -1;
+  }
   return BinNumber;
 }
 
@@ -104,6 +107,9 @@ int Analyse::DetermineMappedReconstructedBinNumber() const {
   }
   int KCharge = RecKinematics.TagKCharge;
   int BinNumber = m_BinningScheme.GetMappedBinNumber(M2Plus, M2Minus, KCharge);
+  if(m_SwapBins) {
+    BinNumber *= -1;
+  }
   return BinNumber;
 }
 
@@ -165,6 +171,9 @@ int Analyse::DetermineGeneratorBinNumber() const {
     KCharge = std::find(D0Daughters.begin(), D0Daughters.end(), -321) != D0barDaughters.end() ? -1 : +1;
   }
   int BinNumber = m_BinningScheme.GetBinNumber(M2Plus, M2Minus, KCharge);
+  if(m_SwapBins) {
+    BinNumber *= -1;
+  }
   if(BinNumber != 0) {
     return BinNumber;
   } else {

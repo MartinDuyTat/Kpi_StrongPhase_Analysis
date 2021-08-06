@@ -14,8 +14,9 @@ class Analyse {
     /**
      * Constructor that saves a pointer to the NTuple containing the data and also sets up binning scheme
      * @param Tree Pointer to data
+     * @param SwapBins Set to true to swap bins
      */
-    Analyse(TreeWrapper *Tree);
+    Analyse(TreeWrapper *Tree, bool SwapBins = false);
   protected:
     /**
      * Convert array index
@@ -47,6 +48,10 @@ class Analyse {
      * Binning scheme
      */
     BinningScheme m_BinningScheme;
+    /**
+     * If this flag is true, swap phase space bins (there was a bug in EvtGen that swapped these)
+     */
+    bool m_SwapBins;
 };
 
 #endif

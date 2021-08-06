@@ -7,9 +7,9 @@
 #include"DoubleTagMeasurement.h"
 
 DoubleTagMeasurement::DoubleTagMeasurement(int NBins, const std::string &K0Mode, const std::string &cisiHadronicParametersFilename, const std::string &KiHadronicParametersFilename, const std::string &DTYieldsFilename): m_NBins(NBins), m_HParameters(cisiHadronicParametersFilename, KiHadronicParametersFilename, m_NBins, K0Mode), m_DTYields(DTYieldsFilename, m_NBins), m_Mode(K0Mode) {
-  std::cout << "Adding the following strong phase parameters from the file " << cisiHadronicParametersFilename << "and fractional yields from the file " << KiHadronicParametersFilename << ":\n";
+  std::cout << "Adding strong phase parameters from " << cisiHadronicParametersFilename << " and fractional yields from " << KiHadronicParametersFilename << ":\n";
   m_HParameters.PrintHadronicParameters();
-  std::cout << "Adding the following double tag yields from the file " << DTYieldsFilename << ":\n";
+  std::cout << "Adding double tag yields from " << DTYieldsFilename << ":\n";
   m_DTYields.PrintYields();
 }
 

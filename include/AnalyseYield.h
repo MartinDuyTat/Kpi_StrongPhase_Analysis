@@ -23,7 +23,7 @@ class AnalyseYield: public Analyse {
      * @param SubtractBackground Set to true to subtract off sideband and peaking backgrounds
      * @param Optional argument with file name to specify peaking backgrounds in each bin
      */
-    AnalyseYield(TreeWrapper *Tree, bool SubtractBackground = true, const std::string &PeakingBackgroundFile = std::string(""));
+    AnalyseYield(TreeWrapper *Tree, bool SubtractBackground = true, const std::string &PeakingBackgroundFile = std::string(""), bool SwapBins = false);
     /**
      * Get the background subtracted yield
      * @return Returns a pair, the first number being the value and the second being a pair with statistical and systematics errors

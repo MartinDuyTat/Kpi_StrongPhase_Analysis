@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Plotting Kpi bin yields and prediction\n";
   KpiSettings::Get().Initialize(std::string(argv[1]));
   std::cout << "Loading data...\n";
-  PresentYields PresentYield(KpiSettings::Get().GetString("K0pipiKpiYieldFile"), KpiSettings::Get().GetString("K0KKKpiYieldFile"), KpiSettings::Get().GetString("K0pipicisiHadronicFile"), KpiSettings::Get().GetString("K0pipiKiHadronicFile"), KpiSettings::Get().GetString("K0KKcisiHadronicFile"), KpiSettings::Get().GetString("K0KKKiHadronicFile"), KpiSettings::Get().GetString("K0Mode"), 0.0587*TMath::Cos(196.1*TMath::Pi()/180.0), 0.0587*TMath::Sin(196.1*TMath::Pi()/180.0));
+  PresentYields PresentYield(KpiSettings::Get().GetString("K0pipiKpiYieldFile"), KpiSettings::Get().GetString("K0KKKpiYieldFile"), KpiSettings::Get().GetString("K0pipicisiHadronicFile"), KpiSettings::Get().GetString("K0pipiKiHadronicFile"), KpiSettings::Get().GetString("K0KKcisiHadronicFile"), KpiSettings::Get().GetString("K0KKKiHadronicFile"), KpiSettings::Get().GetString("K0Mode"), 0.0587*TMath::Cos(190.1*TMath::Pi()/180.0), 0.0587*TMath::Sin(190.1*TMath::Pi()/180.0));
   std::cout << "Data ready\n";
   std::cout << "Plotting...\n";
   PresentYield.PlotYieldPresentation(KpiSettings::Get().GetString("PlotName"));

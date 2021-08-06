@@ -17,7 +17,7 @@
 #include"TCanvas.h"
 #include"TLine.h"
 
-AnalyseYield::AnalyseYield(TreeWrapper *Tree, bool SubtractBackground, const std::string &PeakingBackgroundFile): Analyse(Tree), m_DalitzCoordinates(BinVector<std::vector<std::pair<double, double>>>(true, m_BinningScheme.GetNumberBins())), m_SubtractBackground(SubtractBackground), m_EventsOutsideMBCSpace(0), m_EventsOutsidePhaseSpace(0) {
+AnalyseYield::AnalyseYield(TreeWrapper *Tree, bool SubtractBackground, const std::string &PeakingBackgroundFile, bool SwapBins): Analyse(Tree, SwapBins), m_DalitzCoordinates(BinVector<std::vector<std::pair<double, double>>>(true, m_BinningScheme.GetNumberBins())), m_SubtractBackground(SubtractBackground), m_EventsOutsideMBCSpace(0), m_EventsOutsidePhaseSpace(0) {
   m_Yields.insert({'S', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
   m_PeakingBackground.insert({'S', BinVector<double>(true, m_BinningScheme.GetNumberBins())});
   if(m_Tree->GetSignalMode() == "KSKK" && m_Tree->GetTagMode() != "KeNu") {

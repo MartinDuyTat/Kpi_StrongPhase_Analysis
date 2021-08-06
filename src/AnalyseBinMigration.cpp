@@ -4,7 +4,7 @@
 #include<string>
 #include"AnalyseBinMigration.h"
 
-AnalyseBinMigration::AnalyseBinMigration(TreeWrapper *Tree): Analyse(Tree), m_BinYields(TMatrixT<double>(2*m_BinningScheme.GetNumberBins(), 2*m_BinningScheme.GetNumberBins())) {
+AnalyseBinMigration::AnalyseBinMigration(TreeWrapper *Tree): Analyse(Tree, true), m_BinYields(TMatrixT<double>(2*m_BinningScheme.GetNumberBins(), 2*m_BinningScheme.GetNumberBins())) {
 }
 
 void AnalyseBinMigration::CalculateBinMigrationYields(const std::string &Filename) {
