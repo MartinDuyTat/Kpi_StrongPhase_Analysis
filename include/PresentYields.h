@@ -23,8 +23,9 @@ class PresentYields {
      * @param K0Mode "KS" or "KL"
      * @param rDcosDelta Assumed value of \f$r_D^{K\pi}\cos(\delta_D^{K\pi})\f$
      * @param rDsinDelta Assumed value of \f$r_D^{K\pi}\sin(\delta_D^{K\pi})\f$
+     * @param DrawK0KK Set to true to also draw K0KK yields
      */
-    PresentYields(const std::string &K0pipiKpiYieldFile, const std::string &K0KKKpiYieldFile, const std::string &K0pipicisiHadronicFile, const std::string &K0pipiKiHadronicFile, const std::string &K0KKcisiHadronicFile, const std::string &K0KKKiHadronicFile, const std::string &K0Mode, double rDcosDelta, double rDsinDelta);
+    PresentYields(const std::string &K0pipiKpiYieldFile, const std::string &K0KKKpiYieldFile, const std::string &K0pipicisiHadronicFile, const std::string &K0pipiKiHadronicFile, const std::string &K0KKcisiHadronicFile, const std::string &K0KKKiHadronicFile, const std::string &K0Mode, double rDcosDelta, double rDsinDelta, bool DrawK0KK = true);
     /**
      * Function that plots the Kpi yield and the prediction
      * @param Filename Filename to save plot to

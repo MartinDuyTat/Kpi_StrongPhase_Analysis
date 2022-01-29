@@ -54,7 +54,7 @@ void DeltaKpiFitter::RunFit(const std::string &Filename, const std::string &Plot
   m_Measurements.MinimizeChi2(PlotContourFilename);
   std::ofstream Outfile(Filename);
   Outfile << "Statistical fit\n";
-  Outfile << "Chi2/DOF: " << m_Measurements.GetChi2PerDegreesOfFreedom() << "\n";
+  Outfile << "Chi2/DOF: " << m_Measurements.GetChi2() << "/" << m_Measurements.GetDegreesOfFreedom() << "\n";
   Outfile << "r_D*cos(delta_D): " << m_Measurements.GetFittedrDcosDelta() << " \u00B1 " << m_Measurements.GetErrorrDcosDelta() << "\n";
   Outfile << "r_D*sin(delta_D): " << m_Measurements.GetFittedrDsinDelta() << " \u00B1 " << m_Measurements.GetErrorrDsinDelta() << "\n";
   Outfile << "Correlation: " << m_Measurements.GetCorrelation() << "\n";

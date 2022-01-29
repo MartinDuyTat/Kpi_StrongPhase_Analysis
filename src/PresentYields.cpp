@@ -11,7 +11,10 @@
 #include"TLatex.h"
 #include"TPad.h"
 
-PresentYields::PresentYields(const std::string &K0pipiKpiYieldFile, const std::string &K0KKKpiYieldFile, const std::string &K0pipicisiHadronicFile, const std::string &K0pipiKiHadronicFile, const std::string &K0KKcisiHadronicFile, const std::string &K0KKKiHadronicFile, const std::string &K0Mode, double rDcosDelta, double rDsinDelta): m_K0pipiBins(8), m_K0KKBins(2), m_K0pipiDoubleTagYield(K0pipiKpiYieldFile, m_K0pipiBins), m_K0KKDoubleTagYield(K0KKKpiYieldFile, m_K0KKBins), m_K0pipiHadronicParameters(K0pipicisiHadronicFile, K0pipiKiHadronicFile, m_K0pipiBins, K0Mode), m_K0KKHadronicParameters(K0KKcisiHadronicFile, K0KKKiHadronicFile, m_K0KKBins, K0Mode), m_K0Mode(K0Mode), m_rDcosDelta(rDcosDelta), m_rDsinDelta(rDsinDelta) {
+PresentYields::PresentYields(const std::string &K0pipiKpiYieldFile, const std::string &K0KKKpiYieldFile, const std::string &K0pipicisiHadronicFile, const std::string &K0pipiKiHadronicFile, const std::string &K0KKcisiHadronicFile, const std::string &K0KKKiHadronicFile, const std::string &K0Mode, double rDcosDelta, double rDsinDelta, bool DrawK0KK): m_K0pipiBins(8), m_K0KKBins(2), m_K0pipiDoubleTagYield(K0pipiKpiYieldFile, m_K0pipiBins), m_K0KKDoubleTagYield(K0KKKpiYieldFile, m_K0KKBins), m_K0pipiHadronicParameters(K0pipicisiHadronicFile, K0pipiKiHadronicFile, m_K0pipiBins, K0Mode), m_K0KKHadronicParameters(K0KKcisiHadronicFile, K0KKKiHadronicFile, m_K0KKBins, K0Mode), m_K0Mode(K0Mode), m_rDcosDelta(rDcosDelta), m_rDsinDelta(rDsinDelta) {
+  if(!DrawK0KK) {
+    m_K0KKBins = 0;
+  }
 }
 
 void PresentYields::PlotYieldPresentation(const std::string &Filename) const {
@@ -94,14 +97,18 @@ void PresentYields::PlotYieldPresentation(const std::string &Filename) const {
   TLine Line(2*m_K0pipiBins, 0.0, 2*m_K0pipiBins, h1.GetBinContent(h1.GetMaximumBin()));
   Line.SetLineStyle(kDashed);
   Line.SetLineColor(kBlack);
-  Line.Draw("SAME");
+  if(m_K0KKBins != 0) {
+    Line.Draw("SAME");
+  }
   legend.Draw();
   TLatex K0pipiText;
   K0pipiText.SetNDC();
   K0pipiText.DrawLatex(0.67, 0.4, (K0ModeText + std::string("#pi#pi")).c_str());
   TLatex K0KKText;
   K0KKText.SetNDC();
-  K0KKText.DrawLatex(0.76, 0.4, (K0ModeText + std::string("KK")).c_str());
+  if(m_K0KKBins != 0) {
+    K0KKText.DrawLatex(0.76, 0.4, (K0ModeText + std::string("KK")).c_str());
+  }
   Pad2.cd();
   h4.GetXaxis()->SetLabelFont(0);
   h4.GetXaxis()->SetLabelSize(0);

@@ -64,11 +64,11 @@ class Chi2DoubleTagYield {
      */
     double GetCorrelation() const;
     /**
-     * Get the $\chi^2\f$ per degrees of freedom
+     * Get the $\chi^2\f$
      */
-    double GetChi2PerDegreesOfFreedom() const;
+    double GetChi2() const;
     /**
-     * Get the number of degree of freedom
+     * Get the number of degrees of freedom
      */
     int GetDegreesOfFreedom() const;
     /**

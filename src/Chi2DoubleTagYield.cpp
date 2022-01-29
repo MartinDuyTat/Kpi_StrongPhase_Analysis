@@ -62,7 +62,7 @@ ROOT::Minuit2::Minuit2Minimizer* Chi2DoubleTagYield::RunMinimization(double &rDc
   rDsinDelta = Results[1];
   rDcosDeltaError = Errors[0];
   rDsinDeltaError = Errors[1];
-  Chi2 = Minimizer->MinValue()/static_cast<double>(GetDegreesOfFreedom());
+  Chi2 = Minimizer->MinValue();
   return Minimizer;
 }
 
@@ -156,7 +156,7 @@ double Chi2DoubleTagYield::GetErrorrDsinDelta() const {
   return m_ErrorrDsinDelta;
 }
 
-double Chi2DoubleTagYield::GetChi2PerDegreesOfFreedom() const {
+double Chi2DoubleTagYield::GetChi2() const {
   return m_Chi2;
 }
 
