@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   std::cout << "Plotting Kpi bin yields and prediction\n";
   KpiSettings::Get().Initialize(std::string(argv[1]));
   std::cout << "Loading data...\n";
-  PresentYields PresentYield(KpiSettings::Get().GetString("K0pipiKpiYieldFile"), KpiSettings::Get().GetString("K0KKKpiYieldFile"), KpiSettings::Get().GetString("K0pipicisiHadronicFile"), KpiSettings::Get().GetString("K0pipiKiHadronicFile"), KpiSettings::Get().GetString("K0KKcisiHadronicFile"), KpiSettings::Get().GetString("K0KKKiHadronicFile"), KpiSettings::Get().GetString("K0Mode"), -0.0562213, -0.011149, KpiSettings::Get().GetBool("DrawK0KK"));
+  PresentYields PresentYield(KpiSettings::Get().GetString("K0pipiKpiYieldFile"), KpiSettings::Get().GetString("K0KKKpiYieldFile"), KpiSettings::Get().GetString("K0pipicisiHadronicFile"), KpiSettings::Get().GetString("K0pipiKiHadronicFile"), KpiSettings::Get().GetString("K0KKcisiHadronicFile"), KpiSettings::Get().GetString("K0KKKiHadronicFile"), KpiSettings::Get().GetString("K0Mode"), -0.0562213, -0.011149, KpiSettings::Get().GetBool("DrawK0KK"), KpiSettings::Get().GetBool("PlotPulls"));
   std::cout << "Data ready\n";
   std::cout << "Plotting...\n";
   PresentYield.PlotYieldPresentation(KpiSettings::Get().GetString("PlotName"));
