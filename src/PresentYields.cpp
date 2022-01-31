@@ -30,7 +30,7 @@ void PresentYields::PlotYieldPresentation(const std::string &Filename) const {
   //Pad2.SetBottomMargin(0.1);
   Pad1.Draw();
   Pad2.Draw();
-  TH1D h1("h1", "Prediction", 2*m_K0pipiBins + 2*m_K0KKBins, 0, 2*m_K0pipiBins + 2*m_K0KKBins);
+  TH1D h1("h1", "Fit", 2*m_K0pipiBins + 2*m_K0KKBins, 0, 2*m_K0pipiBins + 2*m_K0KKBins);
   TH1D h2("h2", "Uncorrelated prediction", 2*m_K0pipiBins + 2*m_K0KKBins, 0, 2*m_K0pipiBins + 2*m_K0KKBins);
   TH1D h3("h3", "Measurement", 2*m_K0pipiBins + 2*m_K0KKBins, 0, 2*m_K0pipiBins + 2*m_K0KKBins);
   TH1D h4("h4", "", 2*m_K0pipiBins + 2*m_K0KKBins, 0, 2*m_K0pipiBins + 2*m_K0KKBins);
@@ -92,9 +92,9 @@ void PresentYields::PlotYieldPresentation(const std::string &Filename) const {
   legend.SetFillColor(0);
   legend.SetTextFont(42);
   std::string K0ModeText = m_K0Mode == "KS" ? std::string("K_{S}") : std::string("K_{L}");
-  //std::string Title = K0ModeText + std::string("hh vs K#pi double tag yield measurement and prediction;Bin;Normalized yield");
+  //std::string Title = K0ModeText + std::string("hh vs K#pi double tag yield measurement and prediction;Bin;Normalised yield");
   //h1.SetTitle(Title.c_str());
-  NameAxes(&h1, const_cast<char*>(std::string("Bin number").c_str()), const_cast<char*>(std::string("Normalized yield").c_str()));
+  NameAxes(&h1, const_cast<char*>(std::string("Bin number").c_str()), const_cast<char*>(std::string("Normalised yield").c_str()));
   FormatData(&h3);
   if(m_K0Mode == "KS" && !m_PlotPulls) {
     h1.GetXaxis()->SetLabelOffset(999);
@@ -122,12 +122,12 @@ void PresentYields::PlotYieldPresentation(const std::string &Filename) const {
   TLatex K0pipiText;
   K0pipiText.SetTextSize(0.069);
   K0pipiText.SetNDC();
-  K0pipiText.DrawLatex(0.67, 0.6, ("D#rightarrow " + K0ModeText + std::string("#pi#pi")).c_str());
+  K0pipiText.DrawLatex(0.67, 0.6, ("#it{#bf{D #rightarrow " + K0ModeText + std::string("^{0}#pi^{+}#pi^{#minus}}}")).c_str());
   TLatex K0KKText;
   K0KKText.SetTextSize(0.069);
   K0KKText.SetNDC();
   if(m_K0KKBins != 0) {
-    K0KKText.DrawLatex(0.76, 0.6, ("D#rightarrow " + K0ModeText + std::string("KK")).c_str());
+    K0KKText.DrawLatex(0.76, 0.6, ("#it{#bf{D #rightarrow " + K0ModeText + std::string("^{0}K^{+}K^{#minus}}}")).c_str());
   }
   if(m_PlotPulls) {
     Pad2.cd();
