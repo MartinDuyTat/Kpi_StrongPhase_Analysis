@@ -95,6 +95,7 @@ void PresentYields::PlotYieldPresentation(const std::string &Filename) const {
   //std::string Title = K0ModeText + std::string("hh vs K#pi double tag yield measurement and prediction;Bin;Normalised yield");
   //h1.SetTitle(Title.c_str());
   NameAxes(&h1, const_cast<char*>(std::string("Bin number").c_str()), const_cast<char*>(std::string("Normalised yield").c_str()));
+  h1.GetXaxis()->CenterTitle();
   FormatData(&h3);
   if(m_K0Mode == "KS" && !m_PlotPulls) {
     h1.GetXaxis()->SetLabelOffset(999);
