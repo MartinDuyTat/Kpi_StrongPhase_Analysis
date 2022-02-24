@@ -96,13 +96,12 @@ void PresentYields::PlotYieldPresentation(const std::string &Filename) const {
   //h1.SetTitle(Title.c_str());
   NameAxes(&h1, const_cast<char*>(std::string("Bin number").c_str()), const_cast<char*>(std::string("Normalised yield").c_str()));
   h1.GetXaxis()->CenterTitle();
+  h1.GetYaxis()->CenterTitle();
   FormatData(&h3);
   if(m_K0Mode == "KS" && !m_PlotPulls) {
     h1.GetXaxis()->SetLabelOffset(999);
     h1.GetXaxis()->SetLabelSize(0);
     h1.SetXTitle("");
-  } else if(m_K0Mode == "KL" && !m_PlotPulls) {
-    h1.SetYTitle("");
   }
   h1.SetLineColor(2);
   h1.SetLineStyle(1);
